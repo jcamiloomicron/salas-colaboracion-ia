@@ -1,0 +1,1710 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:dark}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Salas Inteligentes Omicron</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: escenario oscuro tipo cabina, una diapositiva a la vez, barra de navegación inferior con progreso por capítulos. */
+:root{
+  --ink:#3A3838;      /* fondo grafito */
+  --panel:#464343;    /* superficies */
+  --panel-2:#524F4F;
+  --line:#5F5A5A;     /* divisiones, tinte cálido hacia el rojo */
+  --mute:#CEC8C8;     /* texto secundario */
+  --paper:#FFFFFF;    /* texto principal */
+  --gray:#E6E6E6;     /* gris de marca */
+  --red:#D31224;      /* Rojo OMICRON */
+  --red-soft:rgba(211,18,36,.16);
+  --red-glow:rgba(211,18,36,.45);
+  --ok:#E6E6E6;
+  --f-display:"Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --nav-h:64px;
+  color-scheme:dark;
+}
+html,body{height:100%}
+[hidden]{display:none!important}
+body{background:var(--ink);color:var(--paper);font-family:var(--f-body);font-size:15px;line-height:1.55;overflow:hidden}
+*{box-sizing:border-box}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:4px}
+.stage{height:100%;display:flex;flex-direction:column}
+.viewport{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;position:relative;-webkit-overflow-scrolling:touch;background:radial-gradient(1100px 520px at 75% -8%,rgba(255,255,255,.07),transparent 70%)}
+.slide{display:none;min-height:100%;padding-block:clamp(28px,5vh,64px) 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.slide.on{display:block;animation:enter .55s cubic-bezier(.2,.7,.2,1)}
+@keyframes enter{from{opacity:.25;transform:translateY(14px)}to{opacity:1;transform:none}}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--red)}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;line-height:1.05}
+h1{font-size:clamp(38px,6.4vw,84px);font-weight:900;letter-spacing:-.025em}
+h2{font-size:clamp(28px,4vw,52px);font-weight:800;letter-spacing:-.02em}
+h3{font-size:18px;font-weight:700;letter-spacing:-.005em}
+p{margin:0}
+.lead{font-size:clamp(16px,1.5vw,19px);color:var(--mute);max-width:62ch;font-weight:500}
+.red{color:var(--red)}
+.mono{font-family:var(--f-mono)}
+.hint{font-size:12px;color:var(--mute);display:flex;gap:8px;align-items:center;font-weight:600;letter-spacing:.02em}
+.hint::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 0 var(--red-glow);animation:ping 1.8s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 var(--red-glow)}80%,100%{box-shadow:0 0 0 10px rgba(211,18,36,0)}}
+
+/* ---------- Brand ---------- */
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{width:30px;height:30px;flex:none}
+.brand b{font-family:var(--f-display);font-weight:800;letter-spacing:.02em;font-size:17px}
+.brand small{display:block;font-size:8.5px;letter-spacing:.2em;font-weight:600;color:var(--mute);margin-top:-2px}
+
+/* ---------- Nav ---------- */
+.nav{flex:none;border-top:1px solid var(--line);background:var(--ink);display:flex;align-items:center;gap:14px;min-height:var(--nav-h);
+  padding-block:8px calc(8px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.nav .brand{flex:none}
+.prog{flex:1;display:flex;gap:4px;min-width:0}
+.prog button{flex:1;height:30px;background:none;border:0;padding:0;position:relative;min-width:0}
+.prog button::before{content:"";position:absolute;left:0;right:0;top:50%;height:3px;margin-top:-1.5px;background:var(--line);border-radius:2px;transition:background .3s}
+.prog button.done::before{background:#9a3a42}
+.prog button.cur::before{background:var(--red)}
+.prog button span{position:absolute;bottom:100%;left:50%;transform:translate(-50%,4px);white-space:nowrap;font-size:11px;font-weight:600;color:var(--paper);background:var(--panel-2);padding:3px 8px;border-radius:4px;opacity:0;pointer-events:none;transition:.2s}
+.prog button:hover span,.prog button:focus-visible span{opacity:1;transform:translate(-50%,-2px)}
+.count{font-family:var(--f-mono);font-size:12px;color:var(--mute);flex:none;min-width:44px;text-align:right;font-variant-numeric:tabular-nums}
+.arrows{display:flex;gap:6px;flex:none}
+.arrows button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--paper);display:grid;place-items:center;transition:.2s}
+.arrows button:hover{border-color:var(--red);background:var(--red)}
+.arrows button:disabled{opacity:.3;pointer-events:none}
+@media (max-width:640px){.nav .brand small,.nav .brand b{display:none}}
+
+/* ---------- 1 Hero ---------- */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(24px,4vw,56px);align-items:center}
+.hero-copy{display:flex;flex-direction:column;gap:22px;min-width:0}
+.hero h1 em{font-style:normal;color:var(--red)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--gray);background:var(--panel)}
+.board{background:#0B0A0A;border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:6px;min-width:0;box-shadow:0 30px 80px -30px rgba(211,18,36,.35)}
+.board-head{display:flex;justify-content:space-between;align-items:center;font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;color:var(--mute);padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:4px;gap:8px}
+.board-head .clock{color:var(--red)}
+.brow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.flap{display:flex;gap:2px;flex-wrap:nowrap;overflow:hidden}
+.flap i{font-style:normal;font-family:var(--f-mono);font-weight:600;font-size:clamp(11px,1.15vw,14px);width:1.05em;height:1.6em;display:grid;place-items:center;background:#1c1919;color:var(--gray);border-radius:2px;position:relative}
+.flap i::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:#000}
+.status{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.08em;padding:4px 8px;border-radius:3px;white-space:nowrap}
+.st-busy{background:var(--red);color:#fff}
+.st-free{background:var(--gray);color:#141313}
+.st-soon{background:transparent;color:var(--gray);border:1px solid var(--gray)}
+.client{display:flex;gap:16px;align-items:center;font-size:13px;color:var(--mute);flex-wrap:wrap}
+.client strong{color:var(--paper);font-weight:700}
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--red);color:#fff;border:0;border-radius:999px;padding:13px 22px;font-weight:700;font-size:15px;transition:.2s;align-self:flex-start}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px -8px var(--red-glow)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--paper)}
+.btn.ghost:hover{border-color:var(--red)}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+
+/* ---------- 2 Desafíos ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.flip{perspective:1200px;background:none;border:0;padding:0;text-align:left;color:inherit;min-height:190px}
+.flip-in{position:relative;width:100%;height:100%;min-height:190px;transition:transform .6s cubic-bezier(.3,.7,.2,1);transform-style:preserve-3d}
+.flip.open .flip-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:12px;padding:22px;display:flex;flex-direction:column;justify-content:space-between;gap:14px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.front{background:var(--panel);border:1px solid var(--line)}
+.front .q{font-size:19px;font-weight:700;line-height:1.3;color:var(--paper)}
+.front .tag{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);display:flex;justify-content:space-between}
+.back{background:var(--red);transform:rotateY(180deg)}
+.back .tag{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.75)}
+.back .a{font-size:17px;font-weight:700;line-height:1.35;color:#fff}
+.flip:hover .front{border-color:#5a4c4c}
+.score{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.score .bar{flex:1;min-width:160px;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.score .bar i{display:block;height:100%;width:0;background:var(--red);transition:width .5s}
+.score span{font-size:13px;color:var(--mute);font-weight:600}
+@media (max-width:900px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.cards{grid-template-columns:1fr}}
+
+/* ---------- 3 IA simulación ---------- */
+.toggle{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px;flex-wrap:wrap}
+.toggle button{border:0;background:none;color:var(--mute);font-weight:700;font-size:14px;padding:10px 18px;border-radius:999px;transition:.25s}
+.toggle button.on{background:var(--red);color:#fff}
+.toggle button:not(.on):hover{color:var(--paper)}
+.sim{display:grid;grid-template-columns:.9fr 1.1fr;gap:18px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel-h{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.rec{display:flex;align-items:center;gap:6px;color:var(--red)}
+.rec::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--red);animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.2}}
+.roomsvg{width:100%;height:auto;display:block}
+.remote{position:relative;aspect-ratio:16/9;max-width:100%;background:#0B0A0A;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.wide{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:16%}
+.wide .tbl{position:absolute;left:22%;right:22%;bottom:10%;height:22%;background:#2a2626;border-radius:50% 50% 8px 8px/30% 30% 8px 8px}
+.wide .row{display:flex;gap:4%;width:56%;justify-content:center;position:relative;z-index:1}
+.p{position:relative;width:18px;height:26px;flex:none}
+.p::before{content:"";position:absolute;left:50%;top:0;width:44%;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:#6b6363}
+.p::after{content:"";position:absolute;left:8%;right:8%;bottom:0;height:46%;border-radius:50% 50% 4px 4px;background:#4d4646}
+.noise{position:absolute;left:12px;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.bubble{font-size:12px;font-weight:600;background:rgba(0,0,0,.65);border:1px solid var(--line);color:var(--gray);padding:6px 10px;border-radius:8px}
+.bubble.bad{border-color:var(--red);color:#fff}
+.grid4{position:absolute;inset:0;display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:4px;padding:4px}
+.tile{background:#1c1919;border-radius:6px;position:relative;display:grid;place-items:end center;overflow:hidden;transition:outline-color .3s}
+.tile .p{width:42%;height:80%;max-width:110px}
+.tile.big{grid-row:1/4}
+.tile.big .p{width:34%;height:82%;max-width:200px}
+.tile.big .p::before{background:#8a8080}.tile.big .p::after{background:#5e5555}
+.tile .nm{position:absolute;left:6px;bottom:6px;font-size:10px;font-weight:700;background:rgba(0,0,0,.7);padding:2px 6px;border-radius:3px;white-space:nowrap}
+.tile.big .nm{font-size:12px;background:var(--red)}
+.tile.talk{outline:2px solid var(--red);outline-offset:-2px}
+.feats{display:flex;flex-wrap:wrap;gap:6px}
+.feat{font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;border:1px solid var(--line);color:var(--mute);transition:.3s}
+.feat.on{border-color:var(--red);color:#fff;background:var(--red-soft)}
+.feat.off{text-decoration:line-through;opacity:.55}
+.transcript{background:#0B0A0A;border:1px solid var(--line);border-radius:10px;padding:12px;min-height:118px;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.transcript .ln{display:grid;grid-template-columns:auto 1fr;gap:10px;animation:enter .4s}
+.transcript .who{font-family:var(--f-mono);font-size:11px;color:var(--red);font-weight:600;padding-top:2px;white-space:nowrap}
+.transcript .empty{color:var(--mute);font-style:italic;font-size:13px}
+.summary{border:1px solid var(--red);background:var(--red-soft);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;font-size:13px;animation:enter .5s}
+.summary b{font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.summary ul{margin:0;padding-left:18px}
+@media (max-width:900px){.sim{grid-template-columns:1fr}}
+
+/* ---------- 4 Reserva ---------- */
+.book{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,56px);align-items:center}
+.corridor{position:relative;display:flex;justify-content:center;padding:20px 0}
+.door{width:min(100%,420px);aspect-ratio:4/3;background:linear-gradient(90deg,#1b1919 0 62%,#232020 62%);border-radius:10px;border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:flex-start;padding:5%}
+.door::after{content:"";position:absolute;right:6%;top:46%;width:4%;height:12%;border-radius:3px;background:#3d3737}
+.glass{position:absolute;left:66%;right:12%;top:8%;bottom:8%;background:linear-gradient(160deg,#2b2727,#1d1a1a);border-radius:4px;border:1px solid #3a3434}
+.tablet{width:58%;aspect-ratio:16/10.5;background:#0b0a0a;border-radius:12px;border:6px solid #2d2a2a;position:relative;overflow:hidden;box-shadow:0 0 0 1px #000,0 24px 60px -20px rgba(0,0,0,.8);transition:box-shadow .4s}
+.tablet .led{position:absolute;inset:-6px;border-radius:14px;pointer-events:none;box-shadow:0 0 0 3px var(--gray);transition:box-shadow .4s}
+.tablet.busy .led{box-shadow:0 0 0 3px var(--red),0 0 30px 4px var(--red-glow)}
+.scr{position:absolute;inset:0;padding:9% 8%;display:flex;flex-direction:column;justify-content:space-between;gap:4px;transition:background .4s}
+.tablet.busy .scr{background:var(--red)}
+.scr .rn{font-size:clamp(11px,1.2vw,14px);font-weight:800;letter-spacing:.02em}
+.scr .st{font-size:clamp(16px,2.2vw,26px);font-weight:900;line-height:1}
+.scr .sub{font-size:clamp(9px,.95vw,11px);color:rgba(255,255,255,.75);font-weight:600}
+.scr .acts{display:flex;gap:4px;flex-wrap:wrap}
+.scr .acts button{font-size:clamp(9px,.95vw,11px);font-weight:700;padding:5px 8px;border-radius:5px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.08);color:#fff}
+.scr .acts button:hover{background:#fff;color:#141313}
+.scr .acts button.pri{background:#fff;color:var(--red);border-color:#fff}
+.tablet:not(.busy) .scr .acts button.pri{background:var(--red);color:#fff;border-color:var(--red)}
+.steps{display:flex;flex-direction:column;gap:12px}
+.step{display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:start;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--panel);transition:.3s}
+.step .n{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--f-mono);font-size:13px;font-weight:600;color:var(--mute);transition:.3s}
+.step.lit{border-color:var(--red)}
+.step.lit .n{background:var(--red);border-color:var(--red);color:#fff}
+.step p{font-size:14px;color:var(--mute)}
+.toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--paper);color:#141313;font-weight:700;font-size:14px;padding:12px 18px;border-radius:10px;opacity:0;transition:.35s;pointer-events:none;z-index:20;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (max-width:860px){.book{grid-template-columns:1fr}}
+
+/* ---------- 5 Salas ---------- */
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--panel);color:var(--mute);font-weight:700;font-size:14px;padding:10px 16px;border-radius:10px;display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;transition:.2s}
+.tab small{font-family:var(--f-mono);font-size:11px;font-weight:500;color:var(--mute)}
+.tab.on{background:var(--paper);color:#141313;border-color:var(--paper)}
+.tab.on small{color:#5d5555}
+.tab:not(.on):hover{border-color:var(--red);color:var(--paper)}
+.config{display:grid;grid-template-columns:1.35fr 1fr;gap:18px}
+.plan{background:#0E0D0D;border:1px solid var(--line);border-radius:14px;padding:12px;min-width:0;position:relative}
+.plan svg{width:100%;height:auto;display:block}
+.plan .scale{position:absolute;right:16px;bottom:12px;font-family:var(--f-mono);font-size:10px;color:var(--mute)}
+.hot{cursor:pointer}
+.hot circle.dot{fill:var(--red);stroke:#fff;stroke-width:2;transition:r .2s}
+.hot text{fill:#fff;font-family:var(--f-mono);font-size:12px;font-weight:600;pointer-events:none}
+.hot:hover circle.dot,.hot.sel circle.dot{r:15}
+.hot.sel circle.ring{opacity:1}
+.hot circle.ring{fill:none;stroke:var(--red);stroke-width:2;opacity:0;transition:opacity .2s}
+.dev-list{display:flex;flex-direction:column;gap:6px}
+.dev{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:center;text-align:left;background:none;border:1px solid transparent;border-radius:10px;padding:8px 10px;color:var(--gray);font-size:14px;font-weight:600;transition:.2s}
+.dev .k{width:24px;height:24px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);display:grid;place-items:center;font-family:var(--f-mono);font-size:11px}
+.dev:hover{border-color:var(--line)}
+.dev.sel{border-color:var(--red);background:var(--red-soft);color:#fff}
+.dev.sel .k{background:var(--red);border-color:var(--red)}
+.detail{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:8px;min-height:150px}
+.detail h3{font-size:17px}
+.detail .ai{font-size:14px;color:var(--gray)}
+.detail .ai b{color:var(--red);font-size:11px;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:2px}
+.meta{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--mute)}
+.meta b{color:var(--paper);font-family:var(--f-mono);font-weight:600}
+@media (max-width:900px){.config{grid-template-columns:1fr}}
+
+/* ---------- 6 Híbrido ---------- */
+.scen{display:flex;gap:8px;flex-wrap:wrap}
+.scen button{border:1px solid var(--line);background:var(--panel);color:var(--gray);font-weight:700;font-size:14px;padding:10px 16px;border-radius:999px;transition:.2s}
+.scen button.on{background:var(--red);border-color:var(--red);color:#fff}
+.flow{display:grid;grid-template-columns:1fr minmax(180px,.8fr) 1fr;gap:16px;align-items:stretch}
+.col{display:flex;flex-direction:column;gap:8px;min-width:0}
+.col h3{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:700;margin-bottom:4px}
+.io{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:14px;font-weight:600;color:var(--mute);transition:.35s;position:relative}
+.io svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7}
+.io.on{color:#fff;border-color:var(--red);background:var(--red-soft)}
+.col.in .io.on::after,.col.out .io.on::before{content:"";position:absolute;top:50%;width:16px;height:2px;background:var(--red)}
+.col.in .io.on::after{right:-17px}
+.col.out .io.on::before{left:-17px}
+.core{border-radius:16px;border:1px solid var(--red);background:radial-gradient(circle at 50% 30%,rgba(211,18,36,.28),transparent 70%),var(--panel);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:12px;padding:20px}
+.core .orb{width:74px;height:74px;border-radius:50%;background:var(--red);display:grid;place-items:center;animation:ping 2s infinite}
+.core .orb svg{width:36px;height:36px;stroke:#fff;fill:none;stroke-width:1.6}
+.core h4{margin:0;font-size:16px;font-weight:800}
+.core ul{list-style:none;padding:0;margin:0;font-size:12.5px;color:var(--gray);display:flex;flex-direction:column;gap:3px}
+.story{font-size:15px;color:var(--gray);background:var(--panel);border-left:3px solid var(--red);padding:14px 18px;border-radius:0 10px 10px 0;max-width:80ch}
+@media (max-width:820px){.flow{grid-template-columns:1fr}.col.in .io.on::after,.col.out .io.on::before{display:none}}
+
+/* ---------- 7 Señalización ---------- */
+.sig{display:grid;grid-template-columns:.75fr 1.25fr;gap:20px;align-items:start}
+.zones{display:flex;flex-direction:column;gap:8px}
+.zone{display:flex;flex-direction:column;gap:2px;text-align:left;padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--paper);transition:.2s}
+.zone b{font-size:15px}
+.zone span{font-size:13px;color:var(--mute)}
+.zone.on{border-color:var(--red);background:var(--red-soft)}
+.monitor{display:flex;flex-direction:column;align-items:center;gap:0;min-width:0}
+.bezel{width:100%;background:#000;border-radius:10px;padding:10px;border:1px solid #333}
+.screen{aspect-ratio:16/9;max-width:100%;background:#0B0A0A;border-radius:4px;overflow:hidden;position:relative}
+.stand{width:18%;height:22px;background:linear-gradient(#2a2626,#1a1717)}
+.foot{width:34%;height:6px;border-radius:3px;background:#2a2626}
+.ds{position:absolute;inset:0;display:none;padding:4%;gap:3%;animation:enter .5s}
+.ds.on{display:grid}
+.ds-lobby{grid-template-columns:1.4fr 1fr;grid-template-rows:1fr auto}
+.ds-lobby .wel{background:var(--red);border-radius:6px;padding:6%;display:flex;flex-direction:column;justify-content:flex-end;gap:4px}
+.ds-lobby .wel small{font-size:clamp(8px,1vw,12px);font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+.ds-lobby .wel strong{font-size:clamp(14px,2.4vw,30px);font-weight:900;line-height:1.05}
+.ds-lobby .side{display:flex;flex-direction:column;gap:6%}
+.ds-lobby .tm{background:var(--panel);border-radius:6px;padding:8%;font-family:var(--f-mono);font-size:clamp(16px,3vw,38px);font-weight:600;line-height:1}
+.ds-lobby .tm small{display:block;font-family:var(--f-body);font-size:clamp(7px,.9vw,11px);color:var(--mute);margin-top:4px;font-weight:600}
+.ds-lobby .kpi{background:var(--panel);border-radius:6px;padding:8%;flex:1;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.ds-lobby .kpi small{font-size:clamp(7px,.9vw,11px);color:var(--mute);font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.ds-lobby .kpi b{font-size:clamp(10px,1.4vw,17px)}
+.ticker{grid-column:1/-1;background:#fff;color:#141313;border-radius:4px;overflow:hidden;white-space:nowrap;font-size:clamp(8px,1vw,12px);font-weight:700;padding:5px 0}
+.ticker span{display:inline-block;padding-left:100%;animation:tick 22s linear infinite}
+@keyframes tick{to{transform:translateX(-100%)}}
+.ds-hall{grid-template-rows:auto 1fr;gap:2%}
+.ds-hall .hd{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:clamp(8px,1vw,12px);color:var(--mute);letter-spacing:.14em;border-bottom:1px solid var(--line);padding-bottom:2%}
+.ds-hall .rows{display:flex;flex-direction:column;justify-content:space-around}
+.ds-hall .brow{grid-template-columns:1fr auto auto;font-family:var(--f-mono)}
+.ds-hall .tt{font-size:clamp(8px,1vw,12px);color:var(--mute);width:6.5em;text-align:right}
+.ds-train{grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr}
+.ds-train .hd{grid-column:1/-1;display:flex;justify-content:space-between;align-items:end}
+.ds-train .hd b{font-size:clamp(12px,2vw,24px);font-weight:900}
+.ds-train .hd span{font-size:clamp(7px,.9vw,11px);color:var(--mute);font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.course{background:var(--panel);border-radius:6px;padding:6%;display:flex;flex-direction:column;gap:3px;border-top:3px solid var(--line)}
+.course.now{border-top-color:var(--red)}
+.course small{font-family:var(--f-mono);font-size:clamp(7px,.9vw,11px);color:var(--red)}
+.course b{font-size:clamp(9px,1.3vw,16px)}
+.course span{font-size:clamp(7px,.85vw,11px);color:var(--mute)}
+.ds-com{grid-template-columns:1fr 1fr 1fr}
+.ds-com .c{border-radius:6px;padding:8%;display:flex;flex-direction:column;justify-content:flex-end;gap:4px}
+.ds-com .c:nth-child(1){background:var(--paper);color:#141313}
+.ds-com .c:nth-child(2){background:var(--red)}
+.ds-com .c:nth-child(3){background:var(--panel)}
+.ds-com small{font-size:clamp(7px,.85vw,10px);font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+.ds-com b{font-size:clamp(10px,1.5vw,18px);line-height:1.15}
+.sigfeat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.sigfeat div{font-size:13px;color:var(--mute);border-top:1px solid var(--line);padding-top:10px}
+.sigfeat b{display:block;color:var(--paper);font-size:14px;margin-bottom:2px}
+@media (max-width:860px){.sig{grid-template-columns:1fr}.zones{flex-direction:row;flex-wrap:wrap}.zone{flex:1 1 150px}.sigfeat{grid-template-columns:1fr}}
+
+/* ---------- 8 Método ---------- */
+.method{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;border-top:1px solid var(--line)}
+.ph{background:none;border:0;border-right:1px solid var(--line);color:inherit;text-align:left;padding:18px 16px 22px;display:flex;flex-direction:column;gap:10px;position:relative;transition:.25s;min-width:0}
+.ph:last-child{border-right:0}
+.ph::before{content:"";position:absolute;left:0;right:0;top:-1px;height:3px;background:transparent;transition:.25s}
+.ph.on::before{background:var(--red)}
+.ph .n{font-family:var(--f-mono);font-size:12px;color:var(--mute)}
+.ph.on .n{color:var(--red)}
+.ph b{font-size:clamp(16px,1.6vw,20px);font-weight:800}
+.ph p{font-size:13.5px;color:var(--mute)}
+.ph ul{margin:0;padding-left:16px;font-size:13px;color:var(--gray);display:none;gap:4px}
+.ph.on ul{display:grid;animation:enter .4s}
+.ph:hover{background:var(--panel)}
+@media (max-width:900px){.method{grid-template-columns:1fr}.ph{border-right:0;border-bottom:1px solid var(--line)}}
+
+/* ---------- 9 Omicron ---------- */
+.why{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:center}
+.big{font-size:clamp(30px,4.6vw,60px);font-weight:900;line-height:1.02;letter-spacing:-.025em}
+.since{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.since b{font-family:var(--f-mono);font-size:clamp(44px,7vw,90px);font-weight:600;color:var(--red);line-height:1}
+.since span{color:var(--mute);font-weight:600;max-width:28ch}
+.pillars{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pill{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.pill svg{width:24px;height:24px;stroke:var(--red);fill:none;stroke-width:1.7}
+.pill b{font-size:15px}
+.pill p{font-size:13px;color:var(--mute)}
+@media (max-width:860px){.why{grid-template-columns:1fr}}
+@media (max-width:460px){.pillars{grid-template-columns:1fr}}
+
+/* ---------- 10 Contacto ---------- */
+.cta{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,56px);align-items:center}
+.deliver{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+.deliver label{display:grid;grid-template-columns:22px 1fr;gap:12px;padding:14px 4px;border-bottom:1px solid var(--line);cursor:pointer;align-items:start}
+.deliver input{appearance:none;width:20px;height:20px;border:1.5px solid var(--mute);border-radius:5px;margin:2px 0 0;display:grid;place-items:center;transition:.2s}
+.deliver input:checked{background:var(--red);border-color:var(--red)}
+.deliver input:checked::after{content:"";width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.deliver b{display:block;font-size:15px}
+.deliver span{font-size:13px;color:var(--mute)}
+.sign{display:flex;flex-direction:column;gap:6px;padding-top:6px}
+.sign .tagline{font-size:clamp(20px,2.4vw,28px);font-weight:800;line-height:1.15}
+@media (max-width:860px){.cta{grid-template-columns:1fr}}
+
+/* ---------- Casos ---------- */
+.cs-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.cs-total{display:flex;align-items:baseline;gap:12px;background:var(--red);border-radius:14px;padding:16px 22px;max-width:360px}
+.cs-total b{font-family:var(--f-mono);font-size:clamp(40px,5vw,64px);font-weight:600;line-height:1}
+.cs-total span{font-weight:700;font-size:14px;line-height:1.3}
+.cs-filter{display:flex;gap:6px;flex-wrap:wrap}
+.cs-filter button{border:1px solid var(--line);background:var(--panel);color:var(--gray);font-weight:700;font-size:13px;padding:8px 14px;border-radius:999px;transition:.2s}
+.cs-filter button.on{background:var(--paper);color:#1A1A1A;border-color:var(--paper)}
+.cs-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.cs{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;transition:opacity .3s,border-color .3s,transform .3s}
+.cs.dim{opacity:.3}
+.cs.hit{border-color:var(--red);transform:translateY(-2px)}
+.cs-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.cs h3{font-size:clamp(20px,2vw,26px);font-weight:900;letter-spacing:-.01em}
+.cs .num{font-family:var(--f-mono);font-size:30px;font-weight:600;color:var(--red);line-height:1;white-space:nowrap}
+.cs .num small{display:block;font-family:var(--f-body);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-top:4px;text-align:right}
+.cs p{font-size:14px;color:var(--gray)}
+.cs .tags{display:flex;gap:6px;flex-wrap:wrap}
+.cs .tags span{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--ink);color:var(--gray)}
+.cs .go3d{margin-top:auto;align-self:flex-start;border:0;background:none;color:#fff;font-weight:800;font-size:13px;padding:6px 0;border-bottom:2px solid var(--red)}
+.cs .go3d:hover{color:var(--red)}
+.cs.more{background:transparent;border-style:dashed;justify-content:center}
+.cs.more h3{font-size:20px}
+@media (max-width:900px){.cs-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.cs-grid{grid-template-columns:1fr}}
+
+/* ---------- 3D ---------- */
+.r3-acts{display:flex;gap:6px;flex-wrap:wrap}
+.r3-acts button{border:1px solid var(--line);background:var(--panel);color:var(--paper);font-weight:700;font-size:13px;padding:9px 14px;border-radius:999px;transition:.2s}
+.r3-acts button:hover{border-color:var(--red)}
+.r3-acts button.on{background:var(--red);border-color:var(--red)}
+.r3-acts button.pri{background:var(--paper);color:#1A1A1A;border-color:var(--paper)}
+.r3-acts button.pri.on{background:var(--red);color:#fff;border-color:var(--red)}
+.r3-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.r3-wrap{position:relative;min-width:0}
+.r3{position:relative;width:100%;height:min(66vh,680px);min-height:380px;background:#4A4747;border:1px solid var(--line);border-radius:14px;overflow:hidden;touch-action:none}
+.r3 canvas{display:block;width:100%;height:100%;cursor:grab}
+.r3 canvas:active{cursor:grabbing}
+.r3-labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.r3-hot{position:absolute;left:0;top:0;pointer-events:auto;display:flex;align-items:center;gap:7px;padding:4px 10px 4px 4px;border-radius:999px;background:rgba(26,24,24,.88);border:1px solid #5a5252;color:#fff;font-size:12px;font-weight:700;white-space:nowrap;transition:opacity .25s,background .2s,border-color .2s}
+.r3-hot b{width:20px;height:20px;border-radius:50%;background:var(--red);display:grid;place-items:center;font-family:var(--f-mono);font-size:11px;font-weight:600;animation:ping 2.2s infinite}
+.r3-hot .io{display:none;font-style:normal;font-family:var(--f-mono);font-size:10px;font-weight:600;background:#fff;color:#1A1A1A;padding:1px 6px;border-radius:4px}
+.flow-on .r3-hot .io{display:inline-block}
+.r3-hot.zero{border-color:var(--red)}
+.r3-hot:hover{border-color:var(--red)}
+.r3-hot.sel{background:var(--red);border-color:var(--red)}
+.r3-hot.sel b{background:#fff;color:var(--red)}
+.r3-card,.r3-step{position:absolute;left:14px;bottom:14px;background:rgba(26,24,24,.96);border:1px solid var(--red);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;animation:enter .35s;z-index:3}
+.r3-card{width:min(360px,calc(100% - 28px))}
+.r3-step{width:min(460px,calc(100% - 28px))}
+.r3-card .h,.r3-step .sh{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.r3-card .tg{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.r3-card .tg span{font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+.r3-card .tg .io,.r3-step .io{font-family:var(--f-mono);letter-spacing:0;background:#fff;color:#1A1A1A;padding:1px 6px;border-radius:4px}
+.r3-card button,.r3-step .x{background:none;border:0;color:var(--mute);font-size:22px;line-height:1;padding:0 4px}
+.r3-card p,.r3-step p{font-size:14px;color:var(--gray)}
+.r3-step .sh>span{font-family:var(--f-mono);font-size:11px;color:var(--red);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.r3-step .dots{display:flex;gap:5px;flex:1;justify-content:center}
+.r3-step .dots button{width:22px;height:5px;border-radius:3px;border:0;padding:0;background:#5e5959}
+.r3-step .dots button.done{background:#9a3a42}
+.r3-step .dots button.on{background:var(--red)}
+.r3-step h3{font-size:20px}
+.r3-step .bts{font-size:12.5px;color:var(--mute);border-left:2px solid var(--red);padding-left:10px}
+.r3-step .bts b{display:block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#fff}
+.r3-step .plats{display:flex;gap:6px;flex-wrap:wrap}
+.r3-step .plats button{border:1px solid #5e5959;background:transparent;color:#fff;font-weight:700;font-size:12.5px;padding:6px 11px;border-radius:999px}
+.r3-step .plats button.on{background:#fff;color:#1A1A1A;border-color:#fff}
+.r3-step .invite{background:#fff;color:#1A1A1A;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;font-size:12.5px;border-left:4px solid var(--red)}
+.r3-step .invite b{font-size:14px}
+.r3-step .nav2{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.r3-step .nav2 button{border:1px solid #5e5959;background:transparent;color:#fff;font-weight:700;font-size:13px;padding:8px 14px;border-radius:999px}
+.r3-step .nav2 button.pri{background:var(--red);border-color:var(--red)}
+.r3-step .nav2 button.on{border-color:var(--red)}
+.r3-step .nav2 button:disabled{opacity:.35}
+.r3-help{position:absolute;right:12px;top:12px;font-size:11px;color:#e6e0e0;font-weight:600;background:rgba(26,24,24,.7);padding:5px 10px;border-radius:999px;pointer-events:none}
+.r3-live{position:absolute;left:12px;top:12px;font-size:12px;font-weight:600;background:var(--red);color:#fff;padding:6px 12px;border-radius:12px;display:flex;gap:8px;align-items:center;max-width:calc(100% - 24px);z-index:2}
+.r3-live b{font-weight:800}
+.r3-live:not([hidden]) ~ .r3-help{display:none}
+.toggle{border-radius:22px}
+.r3-live::before{content:"";width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1.2s infinite;flex:none}
+.r3-legend{position:absolute;right:12px;bottom:12px;display:flex;gap:12px;flex-wrap:wrap;background:rgba(26,24,24,.88);border-radius:10px;padding:8px 12px;font-size:11.5px;font-weight:700;color:#fff;z-index:2;max-width:calc(100% - 24px)}
+.r3-legend span{display:flex;gap:6px;align-items:center}
+.r3-legend i{width:16px;height:4px;border-radius:2px;display:inline-block}
+.r3-legend i.arc{height:8px;border:2px dotted #fff;border-bottom:0;border-radius:10px 10px 0 0;background:none}
+.r3-fail{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--mute);font-size:14px}
+.r3-side{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px;max-height:min(66vh,680px);overflow:auto}
+.r3-side h4{margin:0;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:700}
+.r3-side .lvl{display:flex;flex-direction:column;gap:8px}
+.r3-side .lvl>span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:700}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--ink);border-radius:10px;padding:3px;gap:3px}
+.seg button{border:0;background:none;color:var(--gray);font-weight:700;font-size:12px;padding:8px 4px;border-radius:8px;line-height:1.2}
+.seg button.on{background:var(--red);color:#fff}
+#r3Opts{display:flex;flex-direction:column;gap:12px}
+.opts{display:flex;flex-direction:column;gap:5px;margin-top:6px}
+.opt{display:grid;grid-template-columns:18px 1fr;gap:9px;align-items:center;text-align:left;background:var(--ink);border:1px solid transparent;border-radius:9px;padding:8px 10px;color:var(--gray);font-size:13px;font-weight:600;transition:.15s}
+.opt i{width:18px;height:18px;border-radius:5px;border:1.5px solid #8a8484;display:grid;place-items:center}
+.opt.on{color:#fff;border-color:#6e6868}
+.opt.on i{background:var(--red);border-color:var(--red)}
+.opt.on i::after{content:"";width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.opt em{grid-column:2;font-style:normal;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--red)}
+.opt.star{border-color:var(--red)}
+.opt:hover{border-color:var(--red)}
+.r3-note{font-size:13px;color:var(--gray)}
+#r3Count{font-size:12.5px;color:var(--mute);border-top:1px solid var(--line);padding-top:10px}
+#r3Count b{color:#fff;font-family:var(--f-mono)}
+@media (max-width:1000px){.r3-grid{grid-template-columns:1fr}.r3-side{max-height:none}}
+@media (max-width:700px){.r3{height:auto;aspect-ratio:4/5;min-height:0}.r3-hot span{display:none}.r3-hot{padding:4px}.r3-help{display:none}
+  .r3-card,.r3-step{position:static;width:100%;margin-top:10px}.r3-legend{left:8px;right:8px;bottom:8px;gap:8px}}
+
+/* ---------- Cero cables ---------- */
+.zc{display:grid;grid-template-columns:.95fr 1.05fr;gap:clamp(20px,3.5vw,48px);align-items:center}
+.zc-copy{display:flex;flex-direction:column;gap:18px;min-width:0}
+.zc-h{font-size:clamp(46px,7.4vw,104px);font-weight:900;letter-spacing:-.035em;line-height:.95}
+.zc-ctl{display:flex;flex-direction:column;gap:10px}
+.zc-ctl .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.zc-ctl .lbl{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);min-width:84px}
+.zc-stage{position:relative;background:linear-gradient(180deg,#504c4c,#433f3f);border:1px solid var(--line);border-radius:16px;overflow:hidden;min-width:0}
+.zc-stage svg{display:block;width:100%;height:auto}
+.zc-status{position:absolute;left:14px;top:14px;font-size:12.5px;font-weight:700;padding:7px 12px;border-radius:999px;background:rgba(26,24,24,.85);color:#fff;display:flex;gap:8px;align-items:center;max-width:calc(100% - 28px)}
+.zc-status::before{content:"";width:8px;height:8px;border-radius:50%;background:#8a8484;flex:none}
+.zc-status.on{background:var(--red)}
+.zc-status.on::before{background:#fff;animation:blink 1.2s infinite}
+.zc-go{font-size:17px;padding:16px 26px}
+.zc-leg{position:absolute;left:14px;bottom:12px;display:flex;gap:12px;font-size:11px;font-weight:700;color:#fff;background:rgba(26,24,24,.8);padding:6px 10px;border-radius:8px}
+.zc-leg span{display:flex;gap:6px;align-items:center}.zc-leg i{width:14px;height:4px;border-radius:2px}
+.zc-leg i.arc{height:7px;border:2px dotted #fff;border-bottom:0;border-radius:8px 8px 0 0;background:none}
+#zcBtnRing{transform-origin:239px 337px;animation:zcp 1.6s infinite}
+@keyframes zcp{0%{transform:scale(1);opacity:.9}100%{transform:scale(2.6);opacity:0}}
+.zc-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.zc-list li{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--mute)}
+.zc-list b{display:block;color:#fff;font-size:14px;margin-bottom:2px}
+.zc-cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.zc-cmp>div{border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.zc-cmp .old{background:var(--panel);border:1px solid var(--line)}
+.zc-cmp .new{background:var(--red)}
+.zc-cmp h3{font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+.zc-cmp ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.zc-cmp .old li{font-size:13px;color:var(--mute);text-decoration:line-through;background:var(--ink);padding:5px 10px;border-radius:999px}
+.zc-cmp .new p{font-size:clamp(20px,2.4vw,30px);font-weight:900;line-height:1.1}
+.zc-cmp .new span{font-size:13.5px;font-weight:600;color:rgba(255,255,255,.88)}
+@media (max-width:900px){.zc{grid-template-columns:1fr}.zc-cmp{grid-template-columns:1fr}}
+@media (max-width:480px){.zc-list{grid-template-columns:1fr}}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="stage">
+<main class="viewport" id="vp">
+
+<!-- 1 · INICIO -->
+<section class="slide" id="s-inicio" data-name="Inicio">
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Propuesta para Copa Airlines · Salas de colaboración</div>
+        <h1>Su sala de reuniones ya no es una sala. <em>Es un recurso.</em></h1>
+        <p class="lead">Diseñamos, configuramos y acompañamos espacios de colaboración donde la inteligencia artificial escucha, encuadra, transcribe y gestiona, para que cada reunión empiece a tiempo y termine con acuerdos.</p>
+        <div class="chips">
+          <span class="chip" style="border-color:var(--red);color:#fff">Salas cero cables</span>
+          <span class="chip">Huddle a auditorio</span>
+          <span class="chip">Reuniones híbridas</span>
+          <span class="chip">Capacitación</span>
+          <span class="chip">Señalización digital</span>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn" data-go="desafios">Comenzar recorrido <span aria-hidden="true">→</span></button>
+          <button class="btn ghost" data-go="recorrido">Ver salas en 3D</button>
+        </div>
+      </div>
+      <div class="board" aria-label="Tablero de estado de salas">
+        <div class="board-head"><span>ESTADO DE SALAS · SEDE CORPORATIVA</span><span class="clock" id="clk">--:--</span></div>
+        <div id="heroBoard" style="display:flex;flex-direction:column;gap:6px"></div>
+        <div class="board-head" style="border:0;border-top:1px solid var(--line);padding:8px 0 0;margin:4px 0 0"><span>ACTUALIZADO EN VIVO DESDE LOS PANELES DE RESERVA</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 · DESAFÍOS -->
+<section class="slide" id="s-desafios" data-name="Desafíos">
+  <div class="wrap">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="eyebrow">El punto de partida</div>
+      <h2>¿Cuántos de estos le suenan?</h2>
+      <p class="lead">Toque cada tarjeta para ver cómo lo resolvemos.</p>
+    </div>
+    <div class="cards" id="cards"></div>
+    <div class="score"><div class="bar"><i id="scoreBar"></i></div><span id="scoreTxt">0 de 6 resueltos</span></div>
+  </div>
+</section>
+
+<!-- 3 · IA -->
+<section class="slide" id="s-ia" data-name="La IA en la sala">
+  <div class="wrap">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="eyebrow">Cómo la IA cambia la reunión</div>
+      <h2>La misma reunión. Dos experiencias.</h2>
+      <p class="lead">Simulación de una reunión de coordinación operativa con participantes remotos. Cambie el modo y observe lo que ve y escucha quien está al otro lado.</p>
+    </div>
+    <div class="toggle" role="tablist" aria-label="Modo de sala">
+      <button role="tab" id="modeOld" aria-selected="false">Sala tradicional</button>
+      <button role="tab" id="modeAI" class="on" aria-selected="true">Sala con IA</button>
+    </div>
+    <div class="sim">
+      <div class="panel">
+        <div class="panel-h"><span>Vista de planta · Sala Bogotá</span><span id="simState">IA activa</span></div>
+        <svg class="roomsvg" id="simRoom" viewBox="0 0 400 300" role="img" aria-label="Planta de la sala con micrófonos y cámara"></svg>
+        <div class="feats" id="feats"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span>Lo que ve el participante remoto</span><span class="rec">EN VIVO</span></div>
+        <div class="remote" id="remote"></div>
+        <div class="transcript" id="transcript" aria-live="polite"></div>
+        <div id="summaryBox"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · RESERVA -->
+<section class="slide" id="s-reserva" data-name="Desde afuera">
+  <div class="wrap">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="eyebrow">La experiencia empieza en el pasillo</div>
+      <h2>Antes de abrir la puerta, la sala ya sabe quién viene.</h2>
+    </div>
+    <div class="book">
+      <div class="corridor">
+        <div class="door">
+          <div class="tablet" id="tablet">
+            <div class="led"></div>
+            <div class="scr" id="scr"></div>
+          </div>
+          <div class="glass" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="steps">
+        <p class="hint">Use el panel: reserve, confirme llegada o simule que nadie llega.</p>
+        <div class="step" data-step="0"><div class="n">1</div><div><h3>Reserva en el panel o en el calendario</h3><p>El panel se sincroniza con el calendario corporativo. Una reserva hecha desde Outlook o desde la puerta aparece en ambos lados.</p></div></div>
+        <div class="step" data-step="1"><div class="n">2</div><div><h3>Estado visible desde el pasillo</h3><p>Luz perimetral roja o blanca: ocupada o libre, a 20 metros de distancia y sin acercarse.</p></div></div>
+        <div class="step" data-step="2"><div class="n">3</div><div><h3>Check-in y liberación automática</h3><p>Si nadie confirma llegada, la sala se libera sola. Se acaban las reuniones fantasma.</p></div></div>
+        <div class="step" data-step="3"><div class="n">4</div><div><h3>Datos reales de uso</h3><p>Sensores de ocupación y analítica: cuántas personas usan cada sala, a qué hora y si el tamaño es el correcto.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4b · CERO CABLES -->
+<section class="slide" id="s-cero" data-name="Cero cables">
+  <div class="wrap">
+    <div class="zc">
+      <div class="zc-copy">
+        <div class="eyebrow">Salas cero cables</div>
+        <h1 class="zc-h">Cero cables.<br><span class="red">Un toque.</span></h1>
+        <p class="lead">Cualquier persona entra, conecta su equipo sin adaptadores y en segundos comparte su pantalla o usa la cámara, los micrófonos y los altavoces de la sala en su propia reunión, sea cual sea la plataforma.</p>
+        <div class="zc-ctl">
+          <div class="row"><span class="lbl">Equipo</span><div class="toggle" id="zcDev"><button class="on" data-v="laptop">Laptop</button><button data-v="tablet">Tablet</button><button data-v="phone">Teléfono</button></div></div>
+          <div class="row"><span class="lbl">Modo</span><div class="toggle" id="zcMode"><button class="on" data-v="share">Compartir pantalla</button><button data-v="conf">Conferencia inalámbrica</button></div></div>
+          <div class="row" id="zcPlatRow" hidden><span class="lbl">Plataforma</span><div class="toggle" id="zcPlat"><button class="on" data-v="Microsoft Teams">Teams</button><button data-v="Google Meet">Meet</button><button data-v="Zoom">Zoom</button><button data-v="Webex">Webex</button></div></div>
+        </div>
+        <button class="btn zc-go" id="zcGo">Tocar el botón</button>
+      </div>
+      <div class="zc-stage">
+        <span class="zc-status" id="zcStatus">Sala lista · esperando</span>
+        <div class="zc-leg"><span><i style="background:#1E7BFF"></i>Audio</span><span><i style="background:#D31224"></i>Video</span><span><i class="arc"></i>Inalámbrico</span></div>
+        <svg id="zcSvg" viewBox="0 0 640 420" role="img" aria-label="Demostración de conexión inalámbrica">
+          <rect x="0" y="0" width="640" height="18" fill="#3a3636"/>
+          <rect x="110" y="18" width="84" height="9" rx="2" fill="#E6E6E6"/>
+          <g id="zcMicW" opacity="0" fill="none" stroke="#1E7BFF" stroke-width="2"><path d="M128 40 q24 14 48 0"/><path d="M118 54 q34 20 68 0"/><path d="M108 68 q44 26 88 0"/></g>
+          <rect x="296" y="46" width="308" height="178" rx="7" fill="#0B0A0A" stroke="#2a2626"/>
+          <g id="zcScrIdle"><rect x="304" y="54" width="292" height="162" fill="#141313"/><text x="330" y="118" fill="#fff" font-family="Montserrat,Arial" font-size="18" font-weight="800">Comparta sin cables</text><text x="330" y="142" fill="#C9C3C3" font-family="Montserrat,Arial" font-size="12" font-weight="600">Toque el botón o abra la app</text><circle cx="552" cy="180" r="14" fill="#D31224"/><circle cx="552" cy="180" r="5" fill="#fff"/></g>
+          <g id="zcScrShare" style="display:none"><rect x="304" y="54" width="292" height="162" fill="#fff"/><rect x="304" y="54" width="5" height="162" fill="#D31224"/><text x="322" y="82" fill="#1A1A1A" font-family="Montserrat,Arial" font-size="15" font-weight="800">Plan de contingencia</text><text x="322" y="98" fill="#7a7171" font-family="Montserrat,Arial" font-size="9" font-weight="600">Rotaciones afectadas · ejemplo</text>
+            <g fill="#CFCFCF"><rect x="330" y="150" width="26" height="50"/><rect x="370" y="132" width="26" height="68"/><rect x="410" y="160" width="26" height="40"/><rect x="490" y="142" width="26" height="58"/><rect x="530" y="128" width="26" height="72"/></g><rect x="450" y="116" width="26" height="84" fill="#D31224"/><rect x="322" y="200" width="250" height="2" fill="#1A1A1A"/></g>
+          <g id="zcScrConf" style="display:none"><rect x="304" y="54" width="292" height="162" fill="#141313"/>
+            <rect x="308" y="58" width="186" height="154" fill="#221F1F"/><circle cx="401" cy="128" r="18" fill="#7a7171"/><path d="M361 212 a40 32 0 0 1 80 0z" fill="#7a7171"/>
+            <rect x="498" y="58" width="94" height="48" fill="#221F1F"/><circle cx="545" cy="80" r="8" fill="#7a7171"/>
+            <rect x="498" y="110" width="94" height="48" fill="#221F1F"/><circle cx="545" cy="132" r="8" fill="#7a7171"/>
+            <rect x="498" y="162" width="94" height="50" fill="#221F1F" stroke="#D31224" stroke-width="2"/><circle cx="530" cy="190" r="6" fill="#9a9090"/><circle cx="548" cy="190" r="6" fill="#9a9090"/><circle cx="566" cy="190" r="6" fill="#9a9090"/>
+            <rect x="314" y="64" width="128" height="16" rx="3" fill="#D31224"/><text id="zcPlatTxt" x="320" y="76" fill="#fff" font-family="Montserrat,Arial" font-size="9" font-weight="800">EN VIVO · MICROSOFT TEAMS</text>
+            <text x="502" y="206" fill="#fff" font-family="Montserrat,Arial" font-size="7" font-weight="700">Esta sala</text></g>
+          <rect x="405" y="228" width="90" height="12" rx="3" fill="#111"/><circle id="zcLens" cx="450" cy="234" r="4" fill="#333"/>
+          <g font-family="Montserrat,Arial" font-weight="700"><rect x="500" y="246" width="112" height="174" rx="4" fill="#1A1818" stroke="#6E6868"/><text x="530" y="412" fill="#fff" font-size="9">Rack de sala</text>
+            <rect x="507" y="254" width="98" height="17" rx="2" fill="#E6E6E6"/><text x="513" y="266" fill="#1A1A1A" font-size="7.5">Punto de acceso</text><circle cx="598" cy="262" r="2.5" fill="#1E7BFF"/>
+            <rect x="507" y="275" width="98" height="17" rx="2" fill="#E6E6E6"/><text x="513" y="287" fill="#1A1A1A" font-size="7.5">Receptor cero cables</text><circle id="zcRecLed" cx="598" cy="283" r="2.5" fill="#8a8484"/>
+            <rect x="507" y="296" width="98" height="17" rx="2" fill="#2E2A2A"/><text x="513" y="308" fill="#E6E6E6" font-size="7.5">Procesador de audio</text><circle cx="590" cy="304" r="2" fill="#1E7BFF"/><circle cx="598" cy="304" r="2" fill="#1E7BFF"/>
+            <rect x="507" y="317" width="98" height="17" rx="2" fill="#2E2A2A"/><text x="513" y="329" fill="#E6E6E6" font-size="7.5">Control de sala</text><circle cx="598" cy="325" r="2" fill="#D31224"/>
+            <rect x="507" y="338" width="98" height="17" rx="2" fill="#2E2A2A"/><text x="513" y="350" fill="#E6E6E6" font-size="7.5">Switch de red</text><g fill="#9a9494"><circle cx="578" cy="346" r="1.6"/><circle cx="584" cy="346" r="1.6"/><circle cx="590" cy="346" r="1.6"/><circle cx="596" cy="346" r="1.6"/></g>
+            <rect x="507" y="359" width="98" height="17" rx="2" fill="#2E2A2A"/><text x="513" y="371" fill="#E6E6E6" font-size="7.5">Cómputo de sala</text></g>
+          <rect x="16" y="350" width="280" height="10" rx="2" fill="#8A8282"/><rect x="40" y="360" width="8" height="60" fill="#5a5454"/><rect x="264" y="360" width="8" height="60" fill="#5a5454"/>
+          <path id="zcDisp" d="M592 246 L592 224" fill="none" stroke="#6E6868" stroke-width="2"/>
+          <path id="zcCam" d="M495 234 L560 234 L560 246" fill="none" stroke="#6E6868" stroke-width="2"/>
+          <path id="zcMicPath" d="M194 22 L626 22 L626 300 L612 300" fill="none" stroke="#6E6868" stroke-width="2"/>
+          <path id="zcPath" d="M246 334 C 320 240, 440 230, 506 262" fill="none" stroke="#E6E0E0" stroke-width="1.5" stroke-dasharray="4 6" opacity=".7"/>
+          <path id="zcBack" d="M506 266 C 440 240, 320 250, 250 330" fill="none" stroke="none"/>
+          <g id="zcLaptop"><rect x="92" y="236" width="122" height="102" rx="5" fill="#2a2a2a"/><rect x="98" y="242" width="110" height="90" fill="#141313" id="zcDevScr"/><path d="M72 350 L234 350 L222 338 L84 338 Z" fill="#8C8C8C"/>
+            <circle id="zcBtnRing" cx="239" cy="337" r="9" fill="none" stroke="#D31224" stroke-width="2"/><rect x="230" y="330" width="18" height="14" rx="3" fill="#D31224"/></g>
+          <g id="zcTablet" style="display:none"><rect x="108" y="252" width="98" height="98" rx="9" fill="#2a2a2a"/><rect x="114" y="258" width="86" height="86" rx="3" fill="#141313"/><rect x="128" y="320" width="58" height="16" rx="8" fill="#D31224"/><text x="139" y="331" fill="#fff" font-family="Montserrat,Arial" font-size="8" font-weight="800">App · Compartir</text></g>
+          <g id="zcPhone" style="display:none"><rect x="136" y="272" width="46" height="78" rx="9" fill="#2a2a2a"/><rect x="140" y="278" width="38" height="66" rx="4" fill="#141313"/><rect x="143" y="324" width="32" height="12" rx="6" fill="#D31224"/><text x="148" y="333" fill="#fff" font-family="Montserrat,Arial" font-size="6" font-weight="800">Compartir</text></g>
+          <g id="zcDots"></g>
+        </svg>
+      </div>
+    </div>
+    <ul class="zc-list">
+      <li><b>Cualquier plataforma</b>Teams, Google Meet, Zoom o Webex: la reunión es del usuario y la sala la potencia.</li>
+      <li><b>Cualquier equipo</b>Laptop, tablet o teléfono, de la empresa o de un visitante.</li>
+      <li><b>Varias personas a la vez</b>Dos o más presentadores comparten lado a lado para comparar.</li>
+      <li><b>Seguro y gestionado</b>Receptor y punto de acceso en el rack, conexión cifrada, red de invitados separada y administración central de todas las salas.</li>
+    </ul>
+    <div class="zc-cmp">
+      <div class="old"><h3>Con cables</h3><ul><li>Buscar el cable correcto</li><li>Adaptador HDMI o USB-C</li><li>Configurar la pantalla</li><li>Cambiar cámara y micrófono</li><li>Escribir el código de la reunión</li></ul></div>
+      <div class="new"><h3>Cero cables</h3><p>Un toque.</p><span>Pantalla, cámara, micrófonos y altavoces de la sala, en la plataforma de cada usuario.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5b · RECORRIDO 3D -->
+<section class="slide" id="s-recorrido" data-name="Configure su sala">
+  <div class="wrap" style="gap:16px">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="eyebrow">Configurador 3D</div>
+      <h2>Arme su sala y véala funcionar.</h2>
+      <p class="lead">Elija el tamaño, suba el nivel o active cada equipo. Después vea paso a paso cómo fluye una reunión, desde la invitación en el calendario hasta el resumen final.</p>
+    </div>
+    <div class="tabs" id="r3Tabs" role="tablist"></div>
+    <div class="r3-acts">
+      <button id="r3Steps" class="pri">▶ Paso a paso de una reunión</button>
+      <button id="r3Ai">IA en acción</button>
+      <button id="r3Flow">Flujo de señal IN / OUT</button>
+      <button id="r3Tour">Recorrer equipos</button>
+      <button id="r3Div" hidden>Unir aulas</button>
+      <button id="r3Home">Vista general</button>
+    </div>
+    <div class="r3-grid">
+      <div class="r3-wrap">
+        <div class="r3" id="r3">
+          <div class="r3-labels" id="r3Labels"></div>
+          <div class="r3-live" id="r3Live" hidden></div>
+          <div class="r3-help">Arrastre para girar · rueda o pellizco para acercar</div>
+          <div class="r3-legend" id="r3Legend" hidden><span><i style="background:#1E7BFF"></i>Audio</span><span><i style="background:#D31224"></i>Video</span><span><i style="background:#F6F6F6"></i>Control y datos</span><span><i class="arc"></i>Inalámbrico</span></div>
+          <div class="r3-fail" id="r3Fail" hidden>Este navegador no puede mostrar la vista 3D.</div>
+        </div>
+        <div class="r3-card" id="r3Card" hidden></div>
+        <div class="r3-step" id="r3Step" hidden></div>
+      </div>
+      <aside class="r3-side" aria-label="Configuración de la sala">
+        <div class="lvl"><span>Nivel de equipamiento</span><div class="seg" id="r3Lvl"></div></div>
+        <div id="r3Opts"></div>
+        <p id="r3Count"></p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- 6 · HÍBRIDO -->
+<section class="slide" id="s-hibrido" data-name="Híbrido">
+  <div class="wrap">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="eyebrow">Cualquier entrada, cualquier salida</div>
+      <h2>Una sala, muchos escenarios.</h2>
+      <p class="lead">El núcleo de control decide qué se captura, cómo se procesa y a dónde llega. Elija un escenario.</p>
+    </div>
+    <div class="scen" id="scen"></div>
+    <div class="flow">
+      <div class="col in" id="colIn"><h3>Entradas</h3></div>
+      <div class="core">
+        <div class="orb"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6v6H9zM9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></svg></div>
+        <h4>Núcleo de control e IA</h4>
+        <ul id="coreList"></ul>
+      </div>
+      <div class="col out" id="colOut"><h3>Salidas</h3></div>
+    </div>
+    <p class="story" id="story"></p>
+  </div>
+</section>
+
+<!-- 7 · SEÑALIZACIÓN -->
+<section class="slide" id="s-senalizacion" data-name="Señalización">
+  <div class="wrap">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="eyebrow">Más allá de la sala</div>
+      <h2>Toda la sede comunica con una sola voz.</h2>
+      <p class="lead">Señalización digital corporativa conectada a las mismas salas, calendarios y sistemas internos. Elija una ubicación.</p>
+    </div>
+    <div class="sig">
+      <div class="zones" id="zones">
+        <button class="zone on" data-z="lobby"><b>Lobby corporativo</b><span>Bienvenida, hora local, comunicados</span></button>
+        <button class="zone" data-z="hall"><b>Pasillo de salas</b><span>Estado en vivo de cada sala</span></button>
+        <button class="zone" data-z="train"><b>Centro de entrenamiento</b><span>Agenda de cursos y aulas</span></button>
+        <button class="zone" data-z="com"><b>Áreas comunes</b><span>Cultura, seguridad y reconocimientos</span></button>
+      </div>
+      <div class="monitor">
+        <div class="bezel"><div class="screen">
+          <div class="ds ds-lobby on" data-z="lobby">
+            <div class="wel"><small>Bienvenidos</small><strong>Equipo de Operaciones Américas</strong></div>
+            <div class="side">
+              <div class="tm"><span id="dsClock">--:--</span><small>Ciudad de Panamá</small></div>
+              <div class="kpi"><small>Hoy en la sede</small><b>Town hall trimestral · 3:00 p.m.</b></div>
+            </div>
+            <div class="ticker"><span>Recordatorio: capacitación de seguridad disponible en el portal interno · Nueva sala de colaboración habilitada en el piso 4 · Reserve su sala desde el calendario o desde el panel de la puerta</span></div>
+          </div>
+          <div class="ds ds-hall" data-z="hall">
+            <div class="hd"><span>SALAS · PISO 4</span><span>ESTADO</span></div>
+            <div class="rows" id="hallBoard"></div>
+          </div>
+          <div class="ds ds-train" data-z="train">
+            <div class="hd"><b>Centro de entrenamiento</b><span>Agenda de hoy</span></div>
+            <div class="course now"><small>08:00 · AULA 1 · EN CURSO</small><b>Procedimientos de servicio a bordo</b><span>Instructor presencial + 2 sedes remotas</span></div>
+            <div class="course"><small>10:30 · AULA 2</small><b>Gestión de irregularidades operacionales</b><span>Grabación disponible para tripulantes</span></div>
+            <div class="course"><small>13:00 · AULA 1+2 UNIDAS</small><b>Inducción de nuevo personal</b><span>Muro móvil abierto · audio combinado</span></div>
+            <div class="course"><small>16:00 · AULA 3</small><b>Taller de liderazgo</b><span>Transmisión en vivo a la región</span></div>
+          </div>
+          <div class="ds ds-com" data-z="com">
+            <div class="c"><small>Reconocimiento</small><b>Equipo del mes: Centro de Control</b></div>
+            <div class="c"><small>Seguridad</small><b>Primero la seguridad. Siempre.</b></div>
+            <div class="c"><small>Comunicado</small><b>Nuevo portal de bienestar para colaboradores</b></div>
+          </div>
+        </div></div>
+        <div class="stand"></div><div class="foot"></div>
+      </div>
+    </div>
+    <div class="sigfeat">
+      <div><b>Gestión central</b>Programe contenido para todas las pantallas desde un solo lugar, por sede, piso o grupo.</div>
+      <div><b>Datos en vivo</b>Estado de salas, agenda de capacitación e indicadores internos se actualizan solos.</div>
+      <div><b>Mensajes de emergencia</b>Un comunicado prioritario puede tomar todas las pantallas al mismo tiempo.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 · MÉTODO -->
+<section class="slide" id="s-metodo" data-name="Cómo trabajamos">
+  <div class="wrap">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="eyebrow">Más allá de las marcas</div>
+      <h2>Primero entendemos la reunión. Después elegimos la tecnología.</h2>
+      <p class="lead">Somos agnósticos de marca: cada componente se elige por la acústica, el tamaño y el uso real de la sala.</p>
+    </div>
+    <div class="method" id="method"></div>
+  </div>
+</section>
+
+<!-- 8b · CASOS -->
+<section class="slide" id="s-casos" data-name="Casos de éxito">
+  <div class="wrap">
+    <div class="cs-head">
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+        <div class="eyebrow">Casos de éxito en Panamá</div>
+        <h2>Proyectos que lideramos y entregamos a satisfacción.</h2>
+        <p class="lead">Salas de reuniones, aulas, capacitación, auditorios y pasillos para organizaciones que operan todos los días en Panamá.</p>
+      </div>
+      <div class="cs-total"><b>+35</b><span>espacios integrados solo en estos cinco proyectos</span></div>
+    </div>
+    <div class="cs-filter" id="csFilter"></div>
+    <div class="cs-grid" id="csGrid"></div>
+  </div>
+</section>
+
+<!-- 9 · OMICRON -->
+<section class="slide" id="s-omicron" data-name="Por qué Omicron">
+  <div class="wrap">
+    <div class="why">
+      <div style="display:flex;flex-direction:column;gap:22px">
+        <div class="eyebrow">Por qué Omicron</div>
+        <p class="big">El mayor integrador de soluciones de colaboración y audio-video de Panamá y <span class="red">la región</span>.</p>
+        <div class="since"><b>1983</b><span>Más de cuatro décadas transformando la operación de las organizaciones en Panamá.</span></div>
+      </div>
+      <div class="pillars">
+        <div class="pill"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><b>Agnósticos de marca</b><p>Trabajamos con los principales fabricantes de audio, video y producción. La sala manda.</p></div>
+        <div class="pill"><svg viewBox="0 0 24 24"><path d="M4 20h16M6 20V10l6-6 6 6v10"/><path d="M10 20v-5h4v5"/></svg><b>Ingeniería propia</b><p>Levantamiento, diseño acústico, planos y programación hechos por nuestro equipo.</p></div>
+        <div class="pill"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg><b>Soporte local</b><p>Plataforma de soporte propia y técnicos en Panamá, cerca de su operación.</p></div>
+        <div class="pill"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M7 10l3 2 3-4 4 3"/></svg><b>Gestión remota</b><p>Monitoreo de dispositivos y actualizaciones sin detener la operación.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 · CONTACTO -->
+<section class="slide" id="s-contacto" data-name="Siguiente paso">
+  <div class="wrap">
+    <div class="cta">
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div class="eyebrow">Siguiente paso</div>
+        <h2>Recorramos juntos sus salas.</h2>
+        <p class="lead">Proponemos un diagnóstico de sus espacios actuales para que Copa Airlines tenga una visión clara de dónde está y a dónde puede llegar. Marque lo que le gustaría recibir.</p>
+        <div class="sign">
+          <div class="brand"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#logoMark"/></svg><div><b>OMICRON</b><small>PANAMA CORPORATION</small></div></div>
+          <p class="tagline">Simplificamos los procesos.<br><span class="red">Garantizamos el servicio.</span></p>
+        </div>
+      </div>
+      <div class="deliver" id="deliver">
+        <label><input type="checkbox" id="d1" checked><div><b>Inventario y estado de salas</b><span>Qué equipos hay, cómo se usan y qué falla hoy.</span></div></label>
+        <label><input type="checkbox" id="d2" checked><div><b>Mapa de brechas por tipo de sala</b><span>Audio, video, control, reserva y experiencia remota.</span></div></label>
+        <label><input type="checkbox" id="d3" checked><div><b>Diseño estándar por tamaño</b><span>Una plantilla para huddle, mediana, grande y capacitación.</span></div></label>
+        <label><input type="checkbox" id="d4"><div><b>Hoja de ruta por fases</b><span>Prioridades, cronograma y presupuesto escalonado.</span></div></label>
+        <label><input type="checkbox" id="d5"><div><b>Demostración en vivo</b><span>Una sala con IA funcionando, en sus instalaciones o las nuestras.</span></div></label>
+        <p class="hint" id="delivCount" style="margin-top:14px"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<nav class="nav" aria-label="Navegación de la presentación">
+  <div class="brand"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#logoMark"/></svg><div><b>OMICRON</b><small>PANAMA CORPORATION</small></div></div>
+  <div class="prog" id="prog"></div>
+  <span class="count" id="count">1/10</span>
+  <div class="arrows">
+    <button id="prev" aria-label="Anterior"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <button id="next" aria-label="Siguiente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg></button>
+  </div>
+</nav>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#9A9A9A"/></linearGradient>
+    <g id="logoMark">
+      <path d="M50 3 L97 50 L50 97 L3 50Z" fill="#D31224"/>
+      <path d="M38 20 C62 30 70 70 38 80 C52 66 52 34 38 20Z" fill="url(#lg)"/>
+      <path d="M38 20 C30 26 24 38 24 50 C24 62 30 74 38 80 C52 66 52 34 38 20Z" fill="#FFFFFF" opacity=".92"/>
+      <path d="M24 50 C24 42 28 36 34 34 C34 44 34 56 34 66 C28 64 24 58 24 50Z" fill="#D31224"/>
+    </g>
+  </defs>
+</svg>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const NS='http://www.w3.org/2000/svg';
+
+/* ============ Navegación ============ */
+const slides=$$('.slide'); const ids=slides.map(s=>s.id.slice(2));
+const prog=$('#prog');
+slides.forEach((s,i)=>{const b=document.createElement('button');b.setAttribute('aria-label',s.dataset.name);b.innerHTML='<span>'+s.dataset.name+'</span>';b.onclick=()=>go(i);prog.appendChild(b)});
+let cur=-1;
+function go(i,fromHash){
+  i=Math.max(0,Math.min(slides.length-1,i)); if(i===cur)return;
+  if(cur>=0) slides[cur].classList.remove('on');
+  cur=i; slides[i].classList.add('on'); $('#vp').scrollTop=0;
+  [...prog.children].forEach((b,k)=>{b.classList.toggle('cur',k===i);b.classList.toggle('done',k<i)});
+  $('#count').textContent=(i+1)+'/'+slides.length;
+  $('#prev').disabled=i===0; $('#next').disabled=i===slides.length-1;
+  if(!fromHash){ try{history.replaceState(null,'','#'+ids[i])}catch(e){location.hash=ids[i]} }
+  onEnter(ids[i]);
+}
+$('#prev').onclick=()=>go(cur-1); $('#next').onclick=()=>go(cur+1);
+$$('[data-go]').forEach(b=>b.onclick=()=>go(ids.indexOf(b.dataset.go)));
+document.addEventListener('keydown',e=>{
+  if(e.target.closest('input,textarea'))return;
+  if(e.key==='ArrowRight'||e.key==='PageDown')go(cur+1);
+  if(e.key==='ArrowLeft'||e.key==='PageUp')go(cur-1);
+});
+let tx=null,ty=null;
+$('#vp').addEventListener('touchstart',e=>{if(e.target.closest('.r3')){tx=null;return}tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+$('#vp').addEventListener('touchend',e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.6)go(cur+(dx<0?1:-1));tx=null},{passive:true});
+function fromHash(){const h=location.hash.slice(1);const k=ids.indexOf(h);go(k>=0?k:0,true)}
+window.addEventListener('hashchange',fromHash);
+
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),2800)}
+
+/* ============ Reloj ============ */
+function tick(){const d=new Date();const s=d.toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'America/Panama'});$('#clk').textContent=s+' PTY';$('#dsClock').textContent=s}
+tick(); setInterval(tick,10000);
+
+/* ============ Tablero split-flap ============ */
+const CH='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+function flap(el,text,len){
+  text=text.toUpperCase().padEnd(len,' ').slice(0,len);
+  if(el.children.length!==len){el.innerHTML='';for(let i=0;i<len;i++)el.appendChild(document.createElement('i'))}
+  [...el.children].forEach((c,i)=>{
+    const target=text[i];
+    if(reduce){c.textContent=target;return}
+    let n=4+Math.floor(Math.random()*6)+i%4;
+    const step=()=>{ if(n--<=0){c.textContent=target;return} c.textContent=target===' '?' ':CH[Math.floor(Math.random()*CH.length)]; setTimeout(step,45)};
+    step();
+  });
+}
+const ROOMS=[['Sala Bogotá','busy'],['Sala Lima','free'],['Sala Ciudad de México','busy'],['Sala São Paulo','soon'],['Sala Santo Domingo','free'],['Aula Tocumen','busy']];
+const LBL={busy:'EN REUNIÓN',free:'DISPONIBLE',soon:'EN 10 MIN'};
+function buildBoard(host,withTime){
+  host.innerHTML='';
+  ROOMS.forEach((r,i)=>{
+    const row=document.createElement('div');row.className='brow';
+    const f=document.createElement('div');f.className='flap';row.appendChild(f);
+    if(withTime){const t=document.createElement('span');t.className='tt';t.textContent=['hasta 11:30','libre hasta 2:00','hasta 12:00','reserva 10:50','libre todo el día','curso hasta 1:00'][i];row.appendChild(t)}
+    const st=document.createElement('span');st.className='status st-'+r[1];st.textContent=LBL[r[1]];row.appendChild(st);
+    host.appendChild(row); flap(f,r[0],16);
+  });
+}
+function shuffleBoard(host){
+  const rows=host.querySelectorAll('.brow');const i=Math.floor(Math.random()*rows.length);
+  const order=['free','soon','busy'];const st=rows[i].querySelector('.status');
+  const curS=order.find(o=>st.classList.contains('st-'+o));const nx=order[(order.indexOf(curS)+1)%3];
+  st.className='status st-'+nx;st.textContent=LBL[nx];
+  flap(rows[i].querySelector('.flap'),ROOMS[i][0],16);
+}
+buildBoard($('#heroBoard'),false); buildBoard($('#hallBoard'),true);
+setInterval(()=>{ if(ids[cur]==='inicio')shuffleBoard($('#heroBoard')); if(ids[cur]==='senalizacion'&&curZone==='hall')shuffleBoard($('#hallBoard')); },3200);
+
+/* ============ Desafíos ============ */
+const PAINS=[
+ ['Arranque','Los primeros minutos de cada reunión se van conectando cables y buscando el control.','Cero cables: un toque y la laptop presenta y usa la cámara y el audio de la sala.'],
+ ['Audio','Los participantes remotos escuchan eco, ruido del aire acondicionado y medias frases.','Micrófonos con IA que cubren toda la sala y eliminan ruido y eco en tiempo real.'],
+ ['Video','La cámara muestra la mesa, no a quien está hablando.','Encuadre automático y seguimiento del orador: cada voz tiene rostro.'],
+ ['Reservas','Salas reservadas que nadie usa mientras otros equipos buscan dónde reunirse.','Check-in en el panel de la puerta. Si nadie llega, la sala se libera sola.'],
+ ['Estándar','Cada sala funciona distinto y cada usuario necesita ayuda distinta.','Una experiencia única: misma interfaz, mismo botón, en todas las sedes.'],
+ ['Soporte','Nadie sabe que algo falló hasta que empieza la reunión importante.','Monitoreo remoto: detectamos la falla antes que el usuario la note.']
+];
+const cards=$('#cards');let solved=new Set();
+PAINS.forEach((p,i)=>{
+  const b=document.createElement('button');b.className='flip';b.setAttribute('aria-pressed','false');
+  b.innerHTML=`<div class="flip-in"><div class="face front"><div class="tag"><span>${p[0]}</span><span>Toque ↻</span></div><div class="q">${p[1]}</div></div><div class="face back"><div class="tag">Con Omicron + IA</div><div class="a">${p[2]}</div></div></div>`;
+  b.onclick=()=>{b.classList.toggle('open');const o=b.classList.contains('open');b.setAttribute('aria-pressed',o);if(o)solved.add(i);updScore()};
+  cards.appendChild(b);
+});
+function updScore(){$('#scoreBar').style.width=(solved.size/PAINS.length*100)+'%';$('#scoreTxt').textContent=solved.size===PAINS.length?'Los 6 resueltos con un solo integrador':solved.size+' de 6 resueltos'}
+
+/* ============ Simulación IA ============ */
+const SPK=[
+ {seat:0,name:'Ana · Operaciones',line:'Tenemos tres rotaciones afectadas por clima. Necesito propuestas en esta reunión.'},
+ {seat:3,name:'Luis · Mantenimiento',line:'La aeronave de reserva está lista. Podemos liberarla en cuarenta minutos.'},
+ {seat:1,name:'Carla · Tripulaciones',line:'Reasigno tripulaciones antes de las cuatro y confirmo descansos.'},
+ {seat:4,name:'Jorge · Servicio al cliente',line:'Activamos notificaciones a los pasajeros con conexión.'}
+];
+const SEATS=[[150,95],[200,95],[250,95],[150,205],[200,205],[250,205]];
+let aiMode=true, spkIdx=0, simTimer=null, lines=[];
+function drawRoom(){
+  const svg=$('#simRoom');const s=SPK[spkIdx%SPK.length];const sp=SEATS[s.seat];
+  const cam=[200,22];
+  let ang=aiMode?Math.atan2(sp[1]-cam[1],sp[0]-cam[0]):Math.PI/2;
+  const spread=aiMode?0.22:1.05,R=aiMode?Math.hypot(sp[0]-cam[0],sp[1]-cam[1])+30:300;
+  const p1=[cam[0]+R*Math.cos(ang-spread),cam[1]+R*Math.sin(ang-spread)],p2=[cam[0]+R*Math.cos(ang+spread),cam[1]+R*Math.sin(ang+spread)];
+  let h=`<rect x="10" y="10" width="380" height="280" rx="6" fill="#1A1818" stroke="#3A3434" stroke-width="2"/>
+  <rect x="130" y="12" width="140" height="8" rx="2" fill="#E6E6E6"/><text x="200" y="36" text-anchor="middle" fill="#A39C9C" font-size="9" font-family="Montserrat" font-weight="700" letter-spacing="1.5">PANTALLA</text>
+  <path d="M${cam[0]} ${cam[1]} L${p1[0]} ${p1[1]} A${R} ${R} 0 0 1 ${p2[0]} ${p2[1]}Z" fill="${aiMode?'rgba(211,18,36,.22)':'rgba(230,230,230,.07)'}" style="transition:all .5s"/>
+  <rect x="122" y="118" width="156" height="64" rx="32" fill="#2C2828" stroke="#3A3434"/>`;
+  if(aiMode){
+    h+=`<circle cx="200" cy="150" r="118" fill="none" stroke="rgba(211,18,36,.25)" stroke-dasharray="3 5"/>
+    <rect x="186" y="142" width="28" height="16" rx="3" fill="#141313" stroke="#D31224"/><text x="200" y="153" text-anchor="middle" fill="#fff" font-size="7" font-family="IBM Plex Mono">MIC</text>
+    <line x1="200" y1="150" x2="${sp[0]}" y2="${sp[1]}" stroke="#D31224" stroke-width="2" stroke-dasharray="4 3"/>`;
+  } else {
+    h+=`<text x="330" y="270" fill="#A39C9C" font-size="9" font-family="Montserrat" font-weight="700">ruido · eco</text>
+    <path d="M300 250 q10 -10 20 0 t20 0 t20 0" stroke="#A39C9C" fill="none"/>`;
+  }
+  SEATS.forEach((p,i)=>{const on=aiMode&&i===s.seat;
+    h+=`${on?`<circle cx="${p[0]}" cy="${p[1]}" r="22" fill="none" stroke="#D31224" stroke-width="2"><animate attributeName="r" values="16;24;16" dur="1.4s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;.2;1" dur="1.4s" repeatCount="indefinite"/></circle>`:''}
+    <circle cx="${p[0]}" cy="${p[1]}" r="14" fill="${on?'#D31224':'#4D4646'}" style="transition:fill .3s"/>`});
+  h+=`<rect x="190" y="16" width="20" height="10" rx="2" fill="${aiMode?'#D31224':'#6b6363'}"/><text x="216" y="25" fill="#A39C9C" font-size="8" font-family="IBM Plex Mono">CÁMARA</text>`;
+  svg.innerHTML=h;
+}
+function drawRemote(){
+  const r=$('#remote');const s=SPK[spkIdx%SPK.length];
+  if(!aiMode){
+    r.innerHTML=`<div class="wide"><div class="tbl"></div><div class="row">${'<div class="p" style="width:14px;height:20px"></div>'.repeat(6)}</div></div>
+    <div class="noise"><span class="bubble bad">¿Quién está hablando?</span><span class="bubble">"...rotaciones... clima... ¿me repiten?"</span></div>`;
+  } else {
+    const others=SPK.filter((x,i)=>i!==spkIdx%SPK.length).slice(0,3);
+    r.innerHTML=`<div class="grid4"><div class="tile big talk"><div class="p"></div><span class="nm">${s.name}</span></div>${others.map(o=>`<div class="tile"><div class="p"></div><span class="nm">${o.name.split(' ·')[0]}</span></div>`).join('')}</div>`;
+  }
+}
+function drawFeats(){
+  const F=['Encuadre automático','Seguimiento de orador','Supresión de ruido','Transcripción en vivo','Resumen y acuerdos'];
+  $('#feats').innerHTML=F.map(f=>`<span class="feat ${aiMode?'on':'off'}">${f}</span>`).join('');
+  $('#simState').textContent=aiMode?'IA activa':'Sin IA';
+}
+function drawTranscript(){
+  const t=$('#transcript');
+  if(!aiMode){t.innerHTML='<span class="empty">Sin transcripción. Alguien tendrá que redactar la minuta después.</span>';return}
+  if(!lines.length){t.innerHTML='<span class="empty">Transcribiendo…</span>';return}
+  t.innerHTML=lines.slice(-3).map(l=>`<div class="ln"><span class="who">${l.n}</span><span>${l.t}</span></div>`).join('');
+}
+function drawSummary(show){
+  $('#summaryBox').innerHTML=show&&aiMode?`<div class="summary"><b>Resumen generado al cerrar la reunión</b><ul><li>Liberar aeronave de reserva en 40 min · Luis</li><li>Reasignar tripulaciones antes de las 4:00 p.m. · Carla</li><li>Notificar a pasajeros en conexión · Jorge</li></ul></div>`:'';
+}
+function simStep(){
+  const s=SPK[spkIdx%SPK.length];
+  if(aiMode){lines.push({n:s.name.split(' ·')[0],t:s.line});}
+  drawRoom();drawRemote();drawTranscript();
+  drawSummary(aiMode&&lines.length>=SPK.length);
+  spkIdx++;
+  if(aiMode&&lines.length>=SPK.length+2){lines=[];spkIdx=0;drawSummary(false)}
+}
+function startSim(){stopSim();lines=[];spkIdx=0;drawFeats();simStep();simTimer=setInterval(simStep,2800)}
+function stopSim(){clearInterval(simTimer);simTimer=null}
+function setMode(ai){aiMode=ai;$('#modeAI').classList.toggle('on',ai);$('#modeOld').classList.toggle('on',!ai);$('#modeAI').setAttribute('aria-selected',ai);$('#modeOld').setAttribute('aria-selected',!ai);startSim()}
+$('#modeAI').onclick=()=>setMode(true);$('#modeOld').onclick=()=>setMode(false);
+
+/* ============ Panel de reserva ============ */
+let bk={state:'free',checked:false,timer:null,left:0};
+function lit(n){$$('.step').forEach(s=>s.classList.toggle('lit',+s.dataset.step===n))}
+function renderTablet(){
+  const tb=$('#tablet'),sc=$('#scr');clearInterval(bk.timer);
+  tb.classList.toggle('busy',bk.state==='busy');
+  if(bk.state==='free'){
+    sc.innerHTML=`<div><div class="rn">SALA LIMA · 8 PERSONAS</div><div class="sub">Próxima reserva 2:00 p.m.</div></div><div class="st">Disponible</div><div class="acts"><button class="pri" data-r="30">Reservar 30 min</button><button data-r="60">60 min</button></div>`;
+    sc.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{bk.state='busy';bk.checked=false;bk.min=+b.dataset.r;renderTablet();lit(1);toast('Reservada '+b.dataset.r+' min. Aparece también en el calendario.')});
+    lit(0);
+  } else {
+    if(!bk.checked){
+      bk.left=10;
+      sc.innerHTML=`<div><div class="rn">SALA LIMA · RESERVADA</div><div class="sub">Reunión de coordinación · ${bk.min} min</div></div><div class="st">Ocupada</div><div class="sub" id="cd">Confirme llegada: 10 min</div><div class="acts"><button class="pri" id="ci">Confirmar llegada</button><button id="ns">Simular que nadie llega</button></div>`;
+      $('#ci').onclick=()=>{bk.checked=true;renderTablet();lit(3);toast('Llegada confirmada. La sala enciende pantalla y sistema de video.')};
+      $('#ns').onclick=()=>{bk.left=1};
+      bk.timer=setInterval(()=>{bk.left--;const c=$('#cd');if(c)c.textContent='Confirme llegada: '+Math.max(bk.left,0)+' min';if(bk.left<=0){clearInterval(bk.timer);bk.state='free';renderTablet();lit(2);toast('Nadie confirmó llegada: la sala se liberó automáticamente.')}},1100);
+    } else {
+      sc.innerHTML=`<div><div class="rn">SALA LIMA · EN REUNIÓN</div><div class="sub">6 personas detectadas · cámara y audio activos</div></div><div class="st">En reunión</div><div class="acts"><button id="end">Terminar y liberar</button><button id="ext">Extender 15 min</button></div>`;
+      $('#end').onclick=()=>{bk.state='free';renderTablet();toast('Sala liberada. Disponible para el siguiente equipo.')};
+      $('#ext').onclick=()=>toast('Extendida 15 min: no hay conflicto con la próxima reserva.');
+    }
+  }
+}
+
+/* ============ Híbrido ============ */
+const IC={
+ laptop:'<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/>',
+ wifi:'<path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1"/>',
+ mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+ cam:'<rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 11l5-3v8l-5-3"/>',
+ board:'<rect x="3" y="4" width="18" height="13" rx="1.5"/><path d="M7 13l3-4 3 3 4-5M9 21h6"/>',
+ doc:'<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/>',
+ screen:'<rect x="2" y="4" width="20" height="13" rx="1.5"/><path d="M8 21h8M12 17v4"/>',
+ stream:'<circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"/>',
+ rec:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/>',
+ remote:'<circle cx="8" cy="9" r="3"/><circle cx="17" cy="9" r="3"/><path d="M2 19c0-3 3-5 6-5s6 2 6 5M14 16c1-1 2-2 4-2 3 0 4 2 4 5"/>',
+ sign:'<rect x="3" y="3" width="18" height="12" rx="1.5"/><path d="M12 15v6M8 21h8M7 7h10M7 11h6"/>',
+ spk:'<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>'
+};
+const IN=[['laptop','Laptop por cable (BYOD)'],['wifi','Laptop sin cables'],['mic','Micrófonos de techo, mesa, solapa y mano'],['cam','Cámaras PTZ con IA'],['board','Pantalla interactiva'],['doc','Cámara de documentos']];
+const OUT=[['screen','Pantallas y LED de gran formato'],['remote','Participantes remotos'],['spk','Audio de sala'],['stream','Transmisión en vivo'],['rec','Grabación y transcripción'],['sign','Señalización digital']];
+const SC=[
+ {n:'Junta directiva',i:['laptop','mic','cam'],o:['screen','remote','spk','rec'],core:['Cambio de cámara por voz','Mezcla automática de micrófonos','Resumen y acuerdos'],s:'La directiva se reúne con gerentes en varios países. El sistema encuadra a quien habla, mezcla el audio de la mesa y entrega la minuta al terminar.'},
+ {n:'Capacitación de tripulación',i:['mic','cam','board','doc'],o:['screen','remote','rec','spk'],core:['Seguimiento del instructor','Anotaciones compartidas','Grabación por módulo'],s:'El instructor demuestra un procedimiento con la cámara de documentos y la pantalla interactiva. Los tripulantes en otra base lo ven en vivo y la clase queda grabada para repaso.'},
+ {n:'Town hall',i:['mic','cam','laptop'],o:['stream','screen','sign','rec'],core:['Producción multicámara','Gráficos y subtítulos','Distribución a toda la sede'],s:'El mensaje del liderazgo llega al auditorio, a las pantallas de la sede y en vivo a las oficinas de la región, con una sola consola de producción.'},
+ {n:'Coordinación operativa',i:['wifi','mic','cam'],o:['screen','remote','spk','rec'],core:['Supresión de ruido','Transcripción en vivo','Arranque con un toque'],s:'Cuando hay una irregularidad, el equipo entra a la sala y conecta con estaciones remotas en segundos. Cada decisión queda transcrita.'}
+];
+function ioRow(host,list){list.forEach(([k,l])=>{const d=document.createElement('div');d.className='io';d.dataset.k=k;d.innerHTML=`<svg viewBox="0 0 24 24">${IC[k]}</svg>${l}`;host.appendChild(d)})}
+ioRow($('#colIn'),IN);ioRow($('#colOut'),OUT);
+SC.forEach((s,i)=>{const b=document.createElement('button');b.textContent=s.n;b.onclick=()=>setScen(i);$('#scen').appendChild(b)});
+function setScen(i){const s=SC[i];
+  $$('#scen button').forEach((b,k)=>b.classList.toggle('on',k===i));
+  $$('#colIn .io').forEach(d=>d.classList.toggle('on',s.i.includes(d.dataset.k)));
+  $$('#colOut .io').forEach(d=>d.classList.toggle('on',s.o.includes(d.dataset.k)));
+  $('#coreList').innerHTML=s.core.map(c=>'<li>'+c+'</li>').join('');$('#story').textContent=s.s;}
+
+/* ============ Señalización ============ */
+let curZone='lobby';
+$$('#zones .zone').forEach(z=>z.onclick=()=>{curZone=z.dataset.z;$$('#zones .zone').forEach(x=>x.classList.toggle('on',x===z));$$('.ds').forEach(d=>d.classList.toggle('on',d.dataset.z===curZone));if(curZone==='hall')buildBoard($('#hallBoard'),true)});
+
+/* ============ Método ============ */
+const PH=[
+ ['Diagnóstico','Recorremos cada sala y entendemos cómo se reúne cada equipo.',['Levantamiento físico y acústico','Entrevistas a usuarios','Inventario y estado de equipos']],
+ ['Diseño','Un estándar por tipo de sala, con planos y presupuesto.',['Planos de ubicación y cobertura','Selección de tecnología sin sesgo de marca','Experiencia de usuario unificada']],
+ ['Integración','Instalamos, programamos y probamos sin detener su operación.',['Instalación por fases y en horario acordado','Programación de escenas y control','Pruebas con las plataformas corporativas']],
+ ['Adopción','Que la gente la use desde el primer día.',['Capacitación a usuarios y TI','Guías rápidas en cada sala','Acompañamiento post-implementación']],
+ ['Servicio gestionado','La sala sigue funcionando el día 1 y el día 1000.',['Monitoreo remoto de dispositivos','Mantenimiento preventivo','Analítica de uso y mejora continua']]
+];
+let curPh=0;
+function renderPh(){$('#method').innerHTML=PH.map((p,i)=>`<button class="ph${i===curPh?' on':''}" data-i="${i}"><span class="n">${String(i+1).padStart(2,'0')}</span><b>${p[0]}</b><p>${p[1]}</p><ul>${p[2].map(x=>'<li>'+x+'</li>').join('')}</ul></button>`).join('');$$('#method .ph').forEach(b=>b.onclick=()=>{curPh=+b.dataset.i;renderPh()})}
+
+/* ============ Contacto ============ */
+function updDeliv(){const n=$$('#deliver input:checked').length;$('#delivCount').textContent=n?`${n} entregable${n>1?'s':''} seleccionado${n>1?'s':''} para el diagnóstico de Copa Airlines`:'Seleccione al menos un entregable'}
+$$('#deliver input').forEach(i=>i.onchange=updDeliv);
+
+/* ============ Recorrido 3D ============ */
+const Room3D=(function(){
+  const S={inited:false,ok:false,active:false,room:'medium',sel:-1,hs:[],people:[],ptz:[],cones:[],texs:[],calls:[],contents:[],
+    ai:false,flow:false,flowOnly:null,tour:false,step:-1,auto:false,platform:'Microsoft Teams',divOpen:false,panels:[],doorPanels:[],
+    mics:[],vcams:[],timers:[],paths:[],pulses:[],presenter:null,act:null,actIdx:0,
+    level:{huddle:1,medium:1,board:1,train:1},opts:{}};
+  const CAT={screen:'Pantallas',mic:'Audio',cam:'Video',ctrl:'Control y conectividad'};
+  const SIGC={audio:0x1E7BFF,video:0xD31224,data:0xF6F6F6};
+  const PLATS=['Microsoft Teams','Google Meet','Zoom','Webex'];
+  const NAMES=['Ana · Operaciones','Luis · Mantenimiento','Carla · Tripulaciones','Jorge · Servicio al cliente','Marta · Finanzas','Diego · Planificación','Sofía · Comercial','Raúl · Seguridad','Elena · Talento humano','Iván · Tecnología','Paula · Carga','Andrés · Aeropuertos'];
+  const OPT={
+    zero:['Conectividad','Cero cables: presentar y conferenciar sin cables',1],
+    byod:['Conectividad','Conexión USB-C por cable (respaldo)'],
+    vbar:['Video','Barra de video con IA'],
+    ptz:['Video','Cámaras PTZ con cambio por voz'],
+    tracker:['Video','Cámara que sigue al presentador'],
+    stream:['Video','Producción y transmisión en vivo'],
+    dual:['Pantallas','Segunda pantalla para contenido'],
+    led:['Pantallas','Pantalla LED de 136" o más'],
+    interactive:['Pantallas','Pantalla interactiva táctil'],
+    micCeil:['Audio','Micrófonos de techo con IA'],
+    audioBar:['Audio','Barra de audio de cobertura total'],
+    micTable:['Audio','Micrófonos de mesa'],
+    micGoose:['Audio','Micrófonos de cuello de ganso'],
+    micLav:['Audio','Micrófono de solapa inalámbrico'],
+    micHand:['Audio','Micrófonos de mano inalámbricos'],
+    speakers:['Audio','Altavoces de techo'],
+    touch:['Control','Controlador táctil'],
+    sensor:['Control','Sensor de ocupación'],
+    panel:['Control','Panel de reserva en la puerta']
+  };
+  const GROUPS=['Conectividad','Audio','Video','Pantallas','Control'];
+  const AV={
+    huddle:{avail:['zero','byod','vbar','micTable','touch','sensor','panel'],
+      L:[['vbar','byod','panel'],['vbar','byod','panel','zero','touch'],['vbar','byod','panel','zero','touch','micTable','sensor']]},
+    medium:{avail:['zero','byod','vbar','ptz','dual','micTable','micCeil','speakers','touch','sensor','panel'],
+      L:[['vbar','byod','dual','touch','panel'],['vbar','byod','dual','touch','panel','zero','micTable','sensor'],['vbar','byod','dual','touch','panel','zero','micCeil','speakers','sensor','ptz']]},
+    board:{avail:['zero','byod','ptz','led','dual','micCeil','micGoose','micHand','speakers','touch','sensor','panel'],
+      L:[['ptz','micGoose','speakers','touch','panel','byod'],['ptz','micGoose','speakers','touch','panel','byod','zero','dual','sensor'],['ptz','micCeil','speakers','touch','panel','byod','zero','dual','sensor','led','micHand']]},
+    train:{avail:['zero','byod','led','interactive','audioBar','micCeil','micLav','micHand','tracker','stream','speakers','touch','panel'],
+      L:[['audioBar','micLav','interactive','touch','panel','byod'],['audioBar','micLav','interactive','touch','panel','byod','zero','tracker','micHand'],['audioBar','micLav','interactive','touch','panel','byod','zero','tracker','micHand','led','stream','micCeil','speakers']]}
+  };
+  const ROOMDEF={huddle:['Huddle','2–6 personas'],medium:['Mediana','6–12 personas'],board:['Directorio','12–24 personas'],train:['Capacitación','20–60 personas'],lobby:['Lobby y pasillos','Señalización digital']};
+  const LEVELS=['Esencial','Avanzada','Inteligente total'];
+  Object.keys(AV).forEach(k=>S.opts[k]=new Set(AV[k].L[S.level[k]]));
+  let T,scene,camera,rd,controls,root,host,m={},V,sphereG;
+
+  /* ---------- pantallas (canvas) ---------- */
+  const F=(s,w)=>`${w||700} ${s}px Montserrat, Arial, sans-serif`;
+  const FM=s=>`600 ${s}px "IBM Plex Mono", Menlo, monospace`;
+  function silh(x,cx,by,s,c){x.fillStyle=c;x.beginPath();x.arc(cx,by-s*.62,s*.2,0,7);x.fill();x.beginPath();x.ellipse(cx,by,s*.42,s*.32,0,Math.PI,2*Math.PI);x.fill()}
+  function tag(x,X,Y,t,red,size){size=size||18;x.font=F(size);const w=x.measureText(t).width+16;x.fillStyle=red?'#D31224':'rgba(0,0,0,.72)';x.fillRect(X,Y-size-8,w,size+12);x.fillStyle='#fff';x.fillText(t,X+8,Y-6)}
+  function tile(x,X,Y,w,h,name,s){x.save();x.fillStyle='#221F1F';x.fillRect(X,Y,w,h);x.beginPath();x.rect(X,Y,w,h);x.clip();silh(x,X+w/2,Y+h+h*.04,h*s,'#7a7171');x.restore();tag(x,X+10,Y+h-10,name,false,h>300?22:15)}
+  function seams(x,W,H){x.strokeStyle='rgba(0,0,0,.35)';x.lineWidth=2;for(let i=1;i<6;i++){x.beginPath();x.moveTo(W*i/6,0);x.lineTo(W*i/6,H);x.stroke()}for(let j=1;j<4;j++){x.beginPath();x.moveTo(0,H*j/4);x.lineTo(W,H*j/4);x.stroke()}}
+  function drawCall(x,W,H,a){
+    a=a||{};
+    if(a.idle){x.fillStyle='#141313';x.fillRect(0,0,W,H);x.fillStyle='#fff';x.font=F(Math.round(H*.12),800);x.fillText('10:00',W*.07,H*.3);x.font=F(Math.round(H*.05),600);x.fillStyle='#C9C3C3';x.fillText('Coordinación operativa · '+S.platform,W*.07,H*.42);
+      x.fillStyle='#D31224';x.fillRect(W*.07,H*.55,W*.32,H*.14);x.fillStyle='#fff';x.font=F(Math.round(H*.055),800);x.fillText('Toque para unirse',W*.09,H*.64);if(a.led)seams(x,W,H);return}
+    if(a.summary){x.fillStyle='#FFFFFF';x.fillRect(0,0,W,H);x.fillStyle='#D31224';x.fillRect(0,0,W*.012,H);x.fillStyle='#1A1A1A';x.font=F(Math.round(H*.075),800);x.fillText('Resumen de la reunión',W*.06,H*.17);
+      x.font=F(Math.round(H*.042),600);x.fillStyle='#5A5454';x.fillText('Enviado a los participantes por '+S.platform,W*.06,H*.25);
+      ['Liberar aeronave de reserva · Luis','Reasignar tripulaciones antes de las 4:00 · Carla','Notificar a pasajeros en conexión · Jorge'].forEach((t,i)=>{x.fillStyle='#D31224';x.fillRect(W*.06,H*(.38+i*.15),H*.03,H*.03);x.fillStyle='#1A1A1A';x.font=F(Math.round(H*.05),700);x.fillText(t,W*.06+H*.06,H*(.41+i*.15))});if(a.led)seams(x,W,H);return}
+    x.fillStyle='#141313';x.fillRect(0,0,W,H);const p=Math.round(W*.014),bw=W*.66,bh=H-2*p,sw=W-bw-p,sh=(bh-2*p)/3;
+    tile(x,p,p,bw-p*2,bh,'Base Ciudad de México',.85);
+    tile(x,bw,p,sw,sh,'Centro de Control',.8);tile(x,bw,p+sh+p,sw,sh,'Hangar · Mantenimiento',.8);
+    const sy=p+2*(sh+p);x.fillStyle='#221F1F';x.fillRect(bw,sy,sw,sh);
+    x.save();x.beginPath();x.rect(bw,sy,sw,sh);x.clip();
+    if(a.self){silh(x,bw+sw/2,sy+sh*1.05,sh*.85,'#9a9090')}else{for(let i=0;i<4;i++)silh(x,bw+sw*(.2+i*.2),sy+sh-4,sh*.34,'#6b6363')}
+    x.restore();if(a.self){x.strokeStyle='#D31224';x.lineWidth=6;x.strokeRect(bw+3,sy+3,sw-6,sh-6)}
+    tag(x,bw+10,sy+sh-10,a.self?'Esta sala · '+a.self.split(' ·')[0]:'Esta sala',!!a.self,15);
+    x.fillStyle='#D31224';x.beginPath();x.arc(p+26,p+28,8,0,7);x.fill();x.fillStyle='#fff';x.font=F(20);x.fillText('EN VIVO · '+S.platform.toUpperCase(),p+42,p+35);
+    if(a.led)seams(x,W,H);
+  }
+  function drawContent(x,W,H,a){
+    x.fillStyle='#FFFFFF';x.fillRect(0,0,W,H);x.fillStyle='#D31224';x.fillRect(0,0,W*.014,H);
+    x.fillStyle='#1A1A1A';x.font=F(Math.round(H*.07),800);x.fillText(a&&a.idle?'Comparta sin cables':'Plan de contingencia',W*.06,H*.15);
+    x.fillStyle='#7a7171';x.font=F(Math.round(H*.038),500);x.fillText(a&&a.idle?'Toque el botón o abra la app':'Rotaciones afectadas · ejemplo',W*.06,H*.21);
+    if(!(a&&a.idle)){const base=H*.88,bars=[.55,.72,.4,.86,.62,.78];bars.forEach((b,i)=>{x.fillStyle=i===3?'#D31224':'#CFCFCF';x.fillRect(W*(.09+i*.137),base-b*H*.55,W*.088,b*H*.55)});x.fillStyle='#1A1A1A';x.fillRect(W*.07,base,W*.86,3)}
+    else{x.fillStyle='#D31224';x.beginPath();x.arc(W*.5,H*.58,H*.14,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(W*.5,H*.58,H*.05,0,7);x.fill()}
+    if(a&&a.led)seams(x,W,H);
+  }
+  function drawBooking(x,W,H,a){
+    const st=a&&a.state;const busy=st==='busy',res=st==='res';x.fillStyle=busy?'#D31224':'#141313';x.fillRect(0,0,W,H);
+    if(res){x.strokeStyle='#D31224';x.lineWidth=12;x.strokeRect(6,6,W-12,H-12)}
+    x.fillStyle='#fff';x.font=F(26,800);x.fillText((a&&a.name||'SALA LIMA').toUpperCase(),26,46);
+    x.font=F(56,900);x.fillText(busy?'En reunión':res?'Reservada':'Disponible',26,136);
+    x.font=F(22,600);x.fillStyle='rgba(255,255,255,.82)';x.fillText(busy?'Hasta las 10:45':res?'10:00 · Coordinación operativa':'Próxima reserva 2:00 p.m.',26,180);
+    x.fillStyle=busy?'#fff':'#D31224';x.fillRect(26,206,220,40);x.fillStyle=busy?'#D31224':'#fff';x.font=F(20,800);x.fillText(busy?'Extender':res?'Confirmar llegada':'Reservar',44,233);
+  }
+  function drawTouch(x,W,H){x.fillStyle='#141313';x.fillRect(0,0,W,H);x.fillStyle='#fff';x.font=F(22,800);x.fillText('10:00',20,34);x.fillStyle='#D31224';x.fillRect(20,52,W-40,50);x.fillStyle='#fff';x.font=F(22,800);x.fillText('Unirse',38,85);x.fillStyle='#2e2a2a';x.fillRect(20,110,W-40,50);x.fillStyle='#E6E6E6';x.fillText('Compartir',38,143)}
+  function drawInteractive(x,W,H){
+    x.fillStyle='#FFFFFF';x.fillRect(0,0,W,H);x.fillStyle='#1A1A1A';x.font=F(36,800);x.fillText('Procedimiento de abordaje',70,70);
+    ['Documentos','Grupo 1–2','Grupo 3–5'].forEach((t,i)=>{const X=90+i*300;x.strokeStyle='#1A1A1A';x.lineWidth=4;x.strokeRect(X,170,220,110);x.font=F(26,700);x.fillText(t,X+20,235);if(i<2){x.beginPath();x.moveTo(X+230,225);x.lineTo(X+290,225);x.stroke()}});
+    x.strokeStyle='#D31224';x.lineWidth=7;x.beginPath();x.ellipse(500,225,175,95,-.05,0,7);x.stroke();
+    x.beginPath();x.moveTo(140,400);x.bezierCurveTo(260,350,380,450,520,390);x.stroke();
+    ['#D31224','#1A1A1A','#A39C9C'].forEach((c,i)=>{x.fillStyle=c;x.beginPath();x.arc(30,140+i*60,16,0,7);x.fill()});
+  }
+  function drawWelcome(x,W,H){
+    x.fillStyle='#D31224';x.fillRect(0,0,W,H);x.fillStyle='#fff';x.font=F(30,700);x.fillText('BIENVENIDOS',60,120);
+    x.font=F(84,900);x.fillText('Sede corporativa',60,230);x.font=F(34,600);x.fillText('Town hall trimestral · 3:00 p.m.',60,300);
+    x.fillStyle='#fff';x.fillRect(0,H-70,W,70);x.fillStyle='#141313';x.font=F(26,700);x.fillText('Reserve su sala desde el calendario o desde el panel de la puerta',40,H-26);
+    x.strokeStyle='rgba(0,0,0,.6)';x.lineWidth=5;x.beginPath();x.moveTo(W/2,0);x.lineTo(W/2,H);x.moveTo(0,H/2);x.lineTo(W,H/2);x.stroke();
+  }
+  function drawTotem(x,W,H){
+    x.fillStyle='#141313';x.fillRect(0,0,W,H);x.fillStyle='#D31224';x.fillRect(0,0,W,120);x.fillStyle='#fff';x.font=F(40,900);x.fillText('Salas hoy',28,78);
+    ROOMS.forEach((r,i)=>{const y=180+i*68;x.fillStyle='#E6E6E6';x.font=F(22,700);x.fillText(r[0],28,y);x.fillStyle=r[1]==='busy'?'#D31224':r[1]==='free'?'#E6E6E6':'#7a7171';x.beginPath();x.arc(W-40,y-8,10,0,7);x.fill()});
+    x.fillStyle='#E6E6E6';x.font=F(30,800);x.fillText('← Salas 401–404',28,H-60);
+  }
+  function drawWay(x,W,H){x.fillStyle='#141313';x.fillRect(0,0,W,H);x.fillStyle='#fff';x.font=F(46,800);x.fillText('← Salas de reunión',30,H/2+16);x.fillStyle='#D31224';x.fillText('Auditorio →',W-330,H/2+16)}
+  function drawCloud(x,W,H,a){x.clearRect(0,0,W,H);x.fillStyle='#D31224';const r=40;x.beginPath();x.moveTo(r,0);x.arcTo(W,0,W,H,r);x.arcTo(W,H,0,H,r);x.arcTo(0,H,0,0,r);x.arcTo(0,0,W,0,r);x.fill();
+    x.fillStyle='#fff';x.font=F(26,700);x.fillText(a&&a.lobby?'NUBE':'NUBE DE LA PLATAFORMA',36,58);x.font=F(44,900);x.fillText(a&&a.lobby?'Gestión de contenido':S.platform,36,118)}
+
+  /* ---------- geometría ---------- */
+  function mk(geo,mat,x,y,z,p){const o=new T.Mesh(geo,mat);o.position.set(x,y,z);(p||root).add(o);return o}
+  function box(w,h,d,mat,x,y,z,p){return mk(new T.BoxGeometry(w,h,d),mat,x,y,z,p)}
+  function cyl(r,h,mat,x,y,z,p,seg){return mk(new T.CylinderGeometry(r,r,h,seg||24),mat,x,y,z,p)}
+  function tex(w,h,draw,arg){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');const t=new T.CanvasTexture(c);t.encoding=T.sRGBEncoding;t.anisotropy=4;
+    const o={t,arg,redraw(a){if(a!==undefined)o.arg=a;draw(x,w,h,o.arg);t.needsUpdate=true}};o.redraw();S.texs.push(o);return o}
+  function screenPlane(w,h,tx,x,y,z,ry,p){const g=new T.Group();g.position.set(x,y,z);g.rotation.y=ry||0;(p||root).add(g);
+    box(w+.05,h+.05,.05,m.black,0,0,0,g);mk(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:tx.t,toneMapped:false}),0,0,.027,g);return g}
+  function shell(w,d,h,doorZ){
+    box(w+.6,.06,d+.6,m.floor,0,-.03,0);
+    box(w,h,.1,m.wall,0,h/2,-d/2-.05);box(.1,h,d,m.wall2,-w/2-.05,h/2,0);
+    box(w,.03,.02,m.red,0,.015,-d/2+.01);
+    const e=new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(w,.001,d)),new T.LineBasicMaterial({color:0x8a8484}));e.position.y=h;root.add(e);
+    if(doorZ!==undefined){box(.02,h,d,m.glass,w/2,h/2,0);[-d/2,d/2,doorZ-.5,doorZ+.5].forEach(z=>box(.05,h,.05,m.black,w/2,h/2,z));box(.05,.05,d,m.black,w/2,h,0);box(.05,.05,1,m.black,w/2,2.1,doorZ)}
+  }
+  function chair(x,z,ry){const g=new T.Group();g.position.set(x,0,z);g.rotation.y=ry;root.add(g);box(.46,.07,.46,m.chair,0,.46,0,g);box(.46,.5,.06,m.chair,0,.74,-.22,g);cyl(.03,.42,m.metal,0,.22,0,g,8);return g}
+  function person(x,z,ry,stand,name,noSpeak){const g=new T.Group();g.position.set(x,0,z);g.rotation.y=ry||0;root.add(g);
+    const bh=stand?.95:.55,by=stand?.95:.78;
+    mk(new T.CylinderGeometry(.17,.2,bh,16),m.body,0,by,stand?0:-.02,g);
+    const head=mk(new T.SphereGeometry(.12,20,16),m.person,0,by+bh/2+.15,stand?0:-.02,g);
+    if(stand){box(.12,.85,.14,m.body,-.08,.42,0,g);box(.12,.85,.14,m.body,.08,.42,0,g)}
+    const pp={g,head,stand:!!stand,name:name||NAMES[S.people.length%NAMES.length]};if(!noSpeak)S.people.push(pp);return pp}
+  function seatRow(list,n){list.forEach((c,i)=>{chair(c[0],c[1],c[2]);if(i<n)person(c[0],c[1],c[2])})}
+  function ptz(x,y,z,hang){const g=new T.Group();g.position.set(x,y,z);root.add(g);
+    if(hang){cyl(.015,.35,m.metal,0,.2,0,g,8)}else box(.24,.03,.2,m.black,0,-.06,0,g);
+    box(.15,.05,.15,m.white,0,-.02,0,g);const h=new T.Group();h.position.y=.08;g.add(h);
+    mk(new T.SphereGeometry(.085,20,16),m.white,0,0,0,h);const l=cyl(.045,.12,m.lens,0,0,.07,h);l.rotation.x=Math.PI/2;mk(new T.SphereGeometry(.01,8,8),m.redGlow,.05,.05,.04,h);
+    S.ptz.push(h);S.vcams.push(()=>h.getWorldPosition(new V()));return h}
+  function videoBar(len,x,y,z){box(len,.08,.09,m.black,x,y,z);const l=cyl(.03,.02,m.lens,x,y,z+.05);l.rotation.x=Math.PI/2;mk(new T.SphereGeometry(.008,8,8),m.redGlow,x+.06,y+.025,z+.05);
+    const p=new V(x,y,z+.06);S.vcams.push(()=>p);S.mics.push(()=>p)}
+  function ceilMic(x,y,z,s,r){box(s,.035,s,m.white,x,y,z);cyl(.004,.12,m.metal,x,y+.07,z,root,6);
+    const H=y-.8;const c=mk(new T.ConeGeometry(r,H,40,1,true),new T.MeshBasicMaterial({color:0xD31224,transparent:true,opacity:.1,side:T.DoubleSide,depthWrite:false}),x,y-H/2,z);S.cones.push(c);
+    const ring=mk(new T.RingGeometry(r-.03,r,48),new T.MeshBasicMaterial({color:0xD31224,transparent:true,opacity:.35,side:T.DoubleSide,depthWrite:false}),x,.8,z);ring.rotation.x=-Math.PI/2;S.cones.push(ring);
+    const p=new V(x,y-.03,z);S.mics.push(()=>p)}
+  function audioBar(len,x,y,z){box(len,.1,.08,m.white,x,y,z);box(len*.96,.05,.005,m.grill,x,y,z+.042);const p=new V(x,y,z+.05);S.mics.push(()=>p)}
+  function spk(x,y,z){cyl(.11,.02,m.white,x,y,z);cyl(.08,.022,m.grill,x,y-.002,z)}
+  function touch(x,y,z,ry){const g=new T.Group();g.position.set(x,y,z);g.rotation.y=ry||0;root.add(g);const k=new T.Group();k.rotation.x=-1;g.add(k);box(.22,.15,.02,m.black,0,.05,0,k);mk(new T.PlaneGeometry(.2,.13),new T.MeshBasicMaterial({map:tex(256,170,drawTouch).t,toneMapped:false}),0,.05,.011,k)}
+  function tableMic(x,y,z){cyl(.075,.015,m.black,x,y,z);mk(new T.TorusGeometry(.075,.006,8,32),m.redGlow,x,y+.009,z).rotation.x=Math.PI/2;const p=new V(x,y+.02,z);S.mics.push(()=>p)}
+  function goose(x,y,z,ry){const g=new T.Group();g.position.set(x,y,z);g.rotation.y=ry;root.add(g);box(.09,.02,.12,m.black,0,0,0,g);
+    const c=new T.CatmullRomCurve3([new V(0,0,0),new V(0,.18,.02),new V(0,.3,.1),new V(0,.33,.2)]);mk(new T.TubeGeometry(c,16,.006,6,false),m.black,0,0,0,g);
+    mk(new T.SphereGeometry(.018,10,8),m.black,0,.33,.2,g);mk(new T.TorusGeometry(.012,.004,6,16),m.redGlow,0,.295,.12,g).rotation.x=1.1;
+    const p=new V();S.mics.push(()=>g.localToWorld(p.set(0,.33,.2)))}
+  function handDock(x,y,z,ry){const g=new T.Group();g.position.set(x,y,z);g.rotation.y=ry||0;root.add(g);box(.3,.06,.14,m.black,0,0,0,g);
+    [-.07,.07].forEach(dx=>{cyl(.018,.2,m.black,dx,.12,0,g,10);mk(new T.SphereGeometry(.03,12,10),m.grill,dx,.24,0,g)})}
+  function laptop(x,y,z,ry,btn){const g=new T.Group();g.position.set(x,y,z);g.rotation.y=ry||0;root.add(g);
+    box(.34,.018,.24,m.lap,0,0,0,g);const h=new T.Group();h.position.set(0,.009,-.12);h.rotation.x=-.28;g.add(h);
+    box(.34,.22,.012,m.lap,0,.11,0,h);const ct=tex(512,320,drawContent,null);S.contents.push(ct);mk(new T.PlaneGeometry(.31,.19),new T.MeshBasicMaterial({map:ct.t,toneMapped:false}),0,.11,.007,h);
+    if(btn){box(.05,.016,.05,m.red,.2,.0,.06,g);const r=mk(new T.TorusGeometry(.04,.005,8,24),m.redGlow,.2,.01,.06,g);r.rotation.x=Math.PI/2;S.pulses.push(r)}
+    return g}
+  function receiver(x,y,z){box(.2,.04,.12,m.white,x,y,z);mk(new T.SphereGeometry(.008,8,8),m.redGlow,x+.07,y+.022,z+.05)}
+  function doorPanel(x,y,z,ry,name,state){const g=new T.Group();g.position.set(x,y,z);g.rotation.y=ry;root.add(g);
+    const ledMat=new T.MeshStandardMaterial({color:0xffffff,emissive:0x000000});box(.31,.21,.012,ledMat,0,0,-.008,g);
+    box(.29,.19,.02,m.black,0,0,0,g);const tx=tex(400,260,drawBooking,{name,state});mk(new T.PlaneGeometry(.26,.17),new T.MeshBasicMaterial({map:tx.t,toneMapped:false}),0,0,.011,g);
+    const dp={tx,ledMat,state};setPanel(dp,state);S.doorPanels.push(dp);return dp}
+  function setPanel(dp,state){if(!dp)return;dp.state=state;dp.tx.redraw(Object.assign({},dp.tx.arg,{state}));
+    if(state==='busy'){dp.ledMat.color.setHex(0xD31224);dp.ledMat.emissive.setHex(0xD31224);dp.ledMat.emissiveIntensity=1.2}
+    else if(state==='res'){dp.ledMat.color.setHex(0xD31224);dp.ledMat.emissive.setHex(0x6a0a12);dp.ledMat.emissiveIntensity=.8}
+    else{dp.ledMat.color.setHex(0xE6E6E6);dp.ledMat.emissive.setHex(0x9a9a9a);dp.ledMat.emissiveIntensity=.8}}
+  function credenza(w,x,z,h){box(w,h||.55,.42,m.cred,x,(h||.55)/2,z)}
+  function rack(x,z){const g=new T.Group();g.position.set(x,0,z);root.add(g);box(.6,1.9,.6,m.black,0,.95,0,g);for(let i=0;i<6;i++)box(.5,.02,.01,i%2?m.redGlow:m.white,0,.4+i*.25,.305,g)}
+  /* io: {in:[], out:[]}; via: punto del receptor inalámbrico */
+  function hs(p,n,c,d,z,io,extra){const h=Object.assign({p:p.isVector3?p:new V(p[0],p[1],p[2]),n,c,d,z:z||2.3},io||{},extra||{});S.hs.push(h);return h}
+  function setCore(x,y,z){S.core=new V(x,y,z)}
+  function rackAV(x,z,H,ry){const g=new T.Group();g.position.set(x,0,z);g.rotation.y=ry;root.add(g);
+    box(.62,H,.62,m.rackM,0,H/2,0,g);box(.56,H-.08,.01,m.glass,0,H/2,.31,g);
+    const U=[['ap',m.white],['rx',m.white],['dsp',m.black],['ctl',m.black],['sw',m.black],['pc',m.black]];const top=H-.14;
+    U.forEach((u,i)=>{const y=top-i*Math.min(.17,(H-.25)/6);box(.5,.1,.04,u[1],0,y,.29,g);
+      if(u[0]==='ap'){cyl(.006,.12,m.black,-.18,y+.11,.29,g,6);cyl(.006,.12,m.black,.18,y+.11,.29,g,6);mk(new T.SphereGeometry(.012,8,8),m.blueGlow,.2,y,.315,g)}
+      else if(u[0]==='rx')mk(new T.SphereGeometry(.012,8,8),m.redGlow,.2,y,.315,g);
+      else for(let k=0;k<5;k++)mk(new T.SphereGeometry(.008,6,6),k%2?m.blueGlow:m.redGlow,-.18+k*.05,y,.315,g)});
+    g.updateMatrixWorld(true);S.core=g.localToWorld(new V(0,top-.25,.34));S.rackAP=g.localToWorld(new V(0,top,.34));S.rackG=g}
+
+  /* ---------- salas ---------- */
+  const BUILD={
+    huddle(has){const w=3.6,d=3.2,h=2.8;shell(w,d,h,1.05);S.dim={w,d,h};
+      credenza(1.3,0,-d/2+.23,.5);rackAV(-w/2+.36,-d/2+.42,1.25,Math.PI/2);
+      const call=tex(1024,576,drawCall,null);S.calls.push(call);
+      screenPlane(1.43,.81,call,0,1.45,-d/2+.06);
+      hs([0,1.45,-1.55],'Pantalla 4K de 65"',['screen'],'Imagen nítida para personas y contenido. Se enciende sola cuando inicia la reunión.',2.4,{out:['video']});
+      if(has('vbar')){videoBar(.72,0,.97,-d/2+.08);hs([0,.97,-1.5],'Barra de video con IA',['cam','mic'],'Cámara 4K de 120°, 8 micrófonos y altavoz en un solo equipo. Encuadra a todos y sigue a quien habla.',1.8,{in:['video','audio'],out:['audio']})}
+      box(.95,.05,1.55,m.table,0,.74,.2);cyl(.05,.72,m.metal,0,.36,.2,root,10);
+      seatRow([[-.68,-.2,Math.PI/2],[.68,.45,-Math.PI/2],[-.68,.65,Math.PI/2],[.68,-.2,-Math.PI/2],[0,1.3,Math.PI]],3);
+      S.anc={table:new V(0,.8,.5),touch:new V(0,.8,-.4),screen:new V(0,1.45,-1.55)};
+      if(has('touch')){touch(0,.77,-.4,0);hs(S.anc.touch,'Controlador táctil',['ctrl'],'Un toque para unirse a la reunión agendada en cualquier plataforma. Sin códigos.',1.6,{in:['data'],out:['data']})}
+      const lp=has('zero')||has('byod');
+      if(lp){laptop(0,.775,.75,0,has('zero'));S.anc.laptop=new V(0,.85,.75)}
+      if(has('zero')){hs([0,.85,.75],'Cero cables',['ctrl'],'Un botón en la laptop envía pantalla, cámara y audio de la sala sin cables, en cualquier plataforma.',1.5,{in:['video','audio'],via:S.rackAP.clone(),zero:true});hs(S.rackAP,'Punto de acceso y receptor cero cables',['ctrl'],'Van en el rack junto al resto de controladores. Reciben la señal inalámbrica de las laptops y la entregan a pantallas, audio y cámara.',1.7)}
+      if(has('byod')){box(.12,.025,.12,m.black,.3,.775,.4);if(!has('zero'))cable(new V(0,.78,.68),new V(.3,.78,.4));hs([.3,.79,.4],'Conexión USB-C de un cable',['ctrl'],'Respaldo por cable: un solo conector para pantalla, cámara y audio.',1.5,{in:['video','audio']})}
+      if(has('micTable')){tableMic(0,.775,.15);hs([0,.79,.15],'Micrófono de mesa',['mic'],'Extiende la captura de voz a toda la mesa.',1.6,{in:['audio']})}
+      if(has('sensor')){cyl(.07,.04,m.white,1.1,h-.03,.6);hs([1.1,h-.05,.6],'Sensor de ocupación',['ctrl'],'Cuenta personas sin grabarlas y libera reservas sin asistencia.',2,{in:['data']})}
+      if(has('panel')){doorPanel(w/2+.035,1.35,1.05-.72,Math.PI/2,'Sala Lima','free');S.anc.panel=new V(w/2+.04,1.35,.33);hs(S.anc.panel,'Panel de reserva',['ctrl'],'Estado, reserva inmediata y check-in. La luz se ve desde el pasillo.',1.7,{out:['data']})}
+      hs(S.core,'Rack de sala',['ctrl','mic'],'Aquí llega todo: punto de acceso y receptor inalámbrico, procesador de audio, control, switch y cómputo de sala. Ordenado, ventilado y accesible para soporte.',1.8);
+      S.home={pos:new V(3.3,3.1,4.3),target:new V(0,.9,-.2)};},
+    medium(has){const w=6,d=5,h=2.8;shell(w,d,h,1.7);S.dim={w,d,h};
+      credenza(2.4,.2,-d/2+.25,.55);rackAV(-w/2+.36,-d/2+.45,1.45,Math.PI/2);
+      const call=tex(1024,576,drawCall,null);S.calls.push(call);
+      if(has('dual')){screenPlane(1.66,.94,call,-.95,1.55,-d/2+.06);const c2=tex(1024,576,drawContent,null);S.contents.push(c2);screenPlane(1.66,.94,c2,.95,1.55,-d/2+.06);
+        hs([-.95,1.55,-2.45],'Pantalla de 75" para personas',['screen'],'Los participantes remotos a tamaño natural.',2.8,{out:['video']});hs([.95,1.55,-2.45],'Pantalla de 75" para contenido',['screen'],'Presentación y tableros sin tapar a las personas.',2.8,{out:['video']})}
+      else{screenPlane(1.66,.94,call,0,1.55,-d/2+.06);hs([0,1.55,-2.45],'Pantalla de 75"',['screen'],'Personas y contenido en una sola pantalla.',2.8,{out:['video']})}
+      if(has('vbar')){videoBar(.9,0,1.0,-d/2+.08);hs([0,1.0,-2.4],'Barra de video con multiencuadre',['cam','mic'],'Muestra a cada participante en su recuadro y destaca a quien habla.',2,{in:['video','audio'],out:['audio']})}
+      if(has('ptz')){ptz(-2.3,1.35,-d/2+.18);ptz(2.3,1.35,-d/2+.18);hs([2.3,1.45,-2.32],'Cámaras PTZ con cambio por voz',['cam'],'Dos cámaras robóticas que giran hacia quien habla y eligen el mejor plano.',1.9,{in:['video']})}
+      box(1.35,.05,3.5,m.table,0,.74,.35);cyl(.06,.72,m.metal,0,.36,-.6,root,10);cyl(.06,.72,m.metal,0,.36,1.3,root,10);
+      const L=[];[-.85,-.05,.75,1.55].forEach(z=>{L.push([-.98,z,Math.PI/2]);L.push([.98,z,-Math.PI/2])});seatRow(L,6);chair(0,2.45,Math.PI);
+      S.presenter=Object.assign(person(-1.6,-1.75,.3,true,'Presentadora · Ana'),{a:new V(-1.95,0,-1.75),b:new V(-1.3,0,-1.7)});
+      S.anc={table:new V(0,.8,1.6),touch:new V(.35,.8,-1.15),screen:new V(0,1.55,-2.45)};
+      if(has('touch')){touch(.35,.77,-1.15,0);hs(S.anc.touch,'Controlador táctil',['ctrl'],'Unirse, compartir, volumen y cámara desde un solo lugar.',1.6,{in:['data'],out:['data']})}
+      if(has('zero')||has('byod')){laptop(0,.775,1.95,0,has('zero'));S.anc.laptop=new V(0,.85,1.95)}
+      if(has('zero')){hs([0,.86,1.95],'Cero cables',['ctrl'],'Cualquier laptop presenta o usa la cámara y el audio de la sala sin cables. Funciona con Teams, Meet, Zoom o Webex.',1.5,{in:['video','audio'],via:S.rackAP.clone(),zero:true});hs(S.rackAP,'Punto de acceso y receptor cero cables',['ctrl'],'Van en el rack junto al resto de controladores. Reciben la señal inalámbrica de las laptops y la entregan a pantallas, audio y cámara.',1.7)}
+      if(has('byod')){box(.12,.025,.12,m.black,-.35,.775,1.6);if(!has('zero'))cable(new V(0,.78,1.88),new V(-.35,.78,1.6));hs([-.35,.79,1.6],'Conexión USB-C de un cable',['ctrl'],'Respaldo por cable en la mesa.',1.5,{in:['video','audio']})}
+      if(has('micTable')){tableMic(0,.775,.85);tableMic(0,.775,-.4);hs([0,.79,.85],'Micrófonos de mesa',['mic'],'Discretos, con captura de 360° para cada extremo de la mesa.',1.8,{in:['audio']})}
+      if(has('micCeil')){ceilMic(0,h-.04,.35,.6,1.95);hs([0,h-.05,.35],'Micrófono de techo con IA',['mic'],'Forma haces que siguen la voz activa. La mesa queda libre de equipos.',2.4,{in:['audio']})}
+      if(has('speakers')){spk(-1.4,h-.01,-.3);spk(1.4,h-.01,1.6);hs([-1.4,h-.02,-.3],'Altavoces de techo',['mic'],'Audio uniforme en toda la sala, sin parlantes visibles.',2.2,{out:['audio']})}
+      if(has('sensor')){cyl(.07,.04,m.white,1.5,h-.03,.8);hs([1.5,h-.05,.8],'Sensor de ocupación',['ctrl'],'Cuenta personas sin grabarlas; libera reservas y alimenta la analítica.',2,{in:['data']})}
+      if(has('panel')){doorPanel(w/2+.035,1.35,1.7-.72,Math.PI/2,'Sala Bogotá','free');S.anc.panel=new V(w/2+.04,1.35,.98);hs(S.anc.panel,'Panel de reserva',['ctrl'],'Sincronizado con el calendario, con check-in y liberación automática.',1.8,{out:['data']})}
+      hs(S.core,'Rack de sala',['ctrl','mic'],'Aquí llega todo: punto de acceso y receptor inalámbrico, procesador de audio, control, switch y cómputo de sala. Ordenado, ventilado y accesible para soporte.',2);
+      S.home={pos:new V(4.6,4.2,5.6),target:new V(0,.9,-.3)};},
+    board(has){const w=9,d=6.5,h=3;shell(w,d,h,2.4);S.dim={w,d,h};
+      credenza(2.6,0,-d/2+.23,.45);rackAV(-w/2+.42,-d/2+.45,1.9,Math.PI/2);
+      const led=has('led');const call=tex(1280,720,drawCall,{led});S.calls.push(call);
+      if(led){screenPlane(3.6,2.03,call,0,1.65,-d/2+.06);hs([0,1.65,-3.2],'Pantalla LED de 163"',['screen'],'Imagen sin uniones y de gran brillo. Personas remotas a tamaño real, legibles desde cualquier asiento.',4.4,{out:['video']})}
+      else{screenPlane(2.17,1.22,call,0,1.5,-d/2+.06);hs([0,1.5,-3.2],'Pantalla de 98"',['screen'],'Gran formato para la mesa completa.',3.4,{out:['video']})}
+      if(has('dual')){const c2=tex(1024,576,drawContent,null);S.contents.push(c2);screenPlane(1.66,.94,c2,-w/2+.06,1.5,-.3,Math.PI/2);hs([-4.44,1.5,-.3],'Pantalla de contenido lateral',['screen'],'Presentaciones y tableros sin tapar a los remotos.',2.6,{out:['video']})}
+      if(has('ptz')){ptz(-2.45,1.3,-d/2+.18);ptz(2.45,1.3,-d/2+.18);hs([-2.45,1.4,-3.07],'Cámaras PTZ con cambio por voz',['cam'],'El sistema detecta quién habla y elige el mejor plano en tiempo real.',2,{in:['video']})}
+      const tb=mk(new T.CylinderGeometry(1,1,.06,64),m.table,0,.74,.5);tb.scale.set(2.7,1,1.15);const pd=cyl(.35,.7,m.metal,0,.36,.5,root,24);pd.scale.set(3.5,1,1);
+      const n=14,L=[];for(let i=0;i<n;i++){const a=i/n*Math.PI*2+Math.PI/n;L.push([3.2*Math.cos(a),.5+1.62*Math.sin(a),Math.atan2(-Math.cos(a),-Math.sin(a)*1.9),a])}
+      L.sort((A,B)=>B[1]-A[1]);seatRow(L,11);
+      S.presenter=Object.assign(person(-1.4,-2.35,0,true,'Presentador · Diego'),{a:new V(-1.8,0,-2.4),b:new V(1.6,0,-2.4)});
+      S.anc={table:new V(1.3,.82,1.3),touch:new V(0,.82,.5),screen:new V(0,1.6,-3.2)};
+      if(has('micCeil')){ceilMic(-1.25,h-.04,.5,.6,2.05);ceilMic(1.25,h-.04,.5,.6,2.05);hs([1.25,h-.05,.5],'Micrófonos de techo con IA',['mic'],'Invisibles para la mesa. Siguen la voz activa: nadie se acerca a un micrófono.',2.6,{in:['audio']})}
+      if(has('micGoose')){L.slice(0,11).forEach(s=>{const a=s[3];goose(2.55*Math.cos(a),.775,.5+1.18*Math.sin(a),Math.atan2(-Math.cos(a),-Math.sin(a)*1.9))});hs([2.55*Math.cos(L[0][3]),1.0,.5+1.18*Math.sin(L[0][3])],'Micrófonos de cuello de ganso',['mic'],'Uno por puesto, con anillo de luz al hablar. Ideal para juntas formales y actas.',1.7,{in:['audio']})}
+      if(has('micHand')){credenza(1.2,3.6,-d/2+.23,.7);handDock(3.6,.73,-d/2+.23);hs([3.6,.95,-3.02],'Micrófonos de mano inalámbricos',['mic'],'Para presentadores y preguntas del público; se cargan en su base.',1.7,{in:['audio']})}
+      if(has('speakers')){[[-3,-1.6],[3,-1.6],[-3,2.3],[3,2.3]].forEach(p=>spk(p[0],h-.01,p[1]));hs([3,h-.02,-1.6],'Altavoces de techo',['mic'],'Voz natural de los participantes remotos en toda la sala.',2.4,{out:['audio']})}
+      if(has('touch')){touch(0,.77,.5,0);hs(S.anc.touch,'Control táctil central',['ctrl'],'Escenas preconfiguradas: junta, presentación o videoconferencia con un toque.',1.8,{in:['data'],out:['data']})}
+      if(has('zero')||has('byod')){laptop(1.3,.785,1.3,-.4,has('zero'));S.anc.laptop=new V(1.3,.86,1.3)}
+      if(has('zero')){hs([1.3,.86,1.3],'Cero cables',['ctrl'],'Cada directivo presenta desde su laptop sin cables ni adaptadores, en cualquier plataforma.',1.5,{in:['video','audio'],via:S.rackAP.clone(),zero:true});hs(S.rackAP,'Punto de acceso y receptor cero cables',['ctrl'],'Van en el rack junto al resto de controladores. Reciben la señal inalámbrica de las laptops y la entregan a pantallas, audio y cámara.',1.7)}
+      if(has('byod')){box(.14,.025,.12,m.black,.6,.785,1.0);if(!has('zero'))cable(new V(1.25,.79,1.22),new V(.6,.79,1.0));hs([.6,.8,1.0],'Conexión USB-C por cable',['ctrl'],'Respaldo por cable en la mesa.',1.5,{in:['video','audio']})}
+      if(has('sensor')){cyl(.07,.04,m.white,3.2,h-.03,1.4);hs([3.2,h-.05,1.4],'Sensor de ocupación',['ctrl'],'Ocupación real de la sala ejecutiva para planificar espacios.',2,{in:['data']})}
+      if(has('panel')){doorPanel(w/2+.035,1.35,2.4-.72,Math.PI/2,'Sala Directorio','free');S.anc.panel=new V(w/2+.04,1.35,1.68);hs(S.anc.panel,'Panel de reserva',['ctrl'],'Estado visible desde el pasillo y check-in para reuniones ejecutivas.',1.8,{out:['data']})}
+      hs(S.core,'Rack de sala',['ctrl','mic'],'Aquí llega todo: punto de acceso y receptor inalámbrico, procesador de audio, control, switch y cómputo de sala. Ordenado, ventilado y accesible para soporte.',2.4);
+      S.home={pos:new V(6.4,5.6,7.6),target:new V(0,.9,-.4)};},
+    train(has){const w=12,d=8,h=3.2;shell(w,d,h,3);S.dim={w,d,h};
+      S.panels=[];for(let i=0;i<8;i++){const p=box(.1,h-.05,.98,m.divider,0,(h-.05)/2,-3.5+i);p.userData={z0:-3.5+i,i};S.panels.push(p)}
+      box(.06,.06,d,m.black,0,h,0);rackAV(w/2-.45,-d/2+.45,1.9,-Math.PI/2);
+      const led=has('led');const inter=tex(1024,576,drawInteractive);
+      [-1,1].forEach(s=>{
+        const tx=s<0?tex(1024,576,drawContent,{led}):tex(1024,576,drawCall,{led});if(s<0)S.contents.push(tx);else S.calls.push(tx);
+        if(led){screenPlane(3.0,1.69,tx,s*3,1.9,-d/2+.06)}else screenPlane(1.9,1.07,tx,s*3,1.7,-d/2+.06);
+        if(has('audioBar'))audioBar(1.5,s*3,led?2.92:2.42,-d/2+.06);
+        if(has('interactive')){const st=new T.Group();st.position.set(s*4.75,0,-2.7);st.rotation.y=-s*.55;root.add(st);box(.06,1.2,.06,m.metal,-.5,.6,0,st);box(.06,1.2,.06,m.metal,.5,.6,0,st);box(1.2,.05,.5,m.black,0,.05,0,st);screenPlane(1.66,.94,inter,0,1.45,0,0,st)}
+        [-.5,1.1,2.7].forEach((z,r)=>{box(3.9,.05,.6,m.table,s*3,.74,z);box(3.9,.7,.04,m.metal,s*3,.37,z-.28);
+          [-1.42,-.47,.47,1.42].forEach((dx,k)=>{chair(s*3+dx,z+.6,Math.PI);if((r*4+k+(s>0?1:0))%3!==2)person(s*3+dx,z+.6,Math.PI)})});
+        if(has('tracker'))ptz(s*3,h-.42,3.6,true);
+        if(has('micCeil'))ceilMic(s*3,h-.04,1.1,.6,2.3);
+        if(has('speakers')){spk(s*2,h-.01,0);spk(s*4,h-.01,2)}
+      });
+      S.presenter=Object.assign(person(-3,-2.9,0,true,'Instructora · Aula A'),{a:new V(-4.2,0,-2.95),b:new V(-1.6,0,-2.95)});
+      person(3.1,-2.9,0,true,'Instructor · Aula B',true);
+      box(.6,1.05,.45,m.cred,-1.05,.525,-3.35);S.anc={table:new V(-1.05,1.1,-3.35),touch:new V(-.9,1.12,-3.3),screen:new V(-3,1.8,-3.95)};
+      const sc=led?1.9:1.7;
+      hs([3,sc,-3.95],led?'Pantalla LED de 136"':'Pantalla de 86"',['screen'],led?'Gran formato sin uniones para aulas y auditorios. Contenido legible desde la última fila, incluso con luz encendida.':'Participantes remotos y contenido para todo el salón.',led?4.2:3.2,{out:['video']});
+      if(has('audioBar'))hs([-3,led?2.92:2.42,-3.92],'Barra de audio de cobertura total',['mic'],'Miles de micrófonos virtuales cubren el aula: se escucha igual al instructor que a la última fila.',3,{in:['audio'],out:['audio']});
+      if(has('interactive'))hs([-4.75,1.45,-2.7],'Pantalla interactiva táctil',['screen','ctrl'],'El instructor anota, comparte y guarda la clase. Los remotos ven lo mismo.',2.6,{in:['video'],out:['video']});
+      if(has('tracker'))hs([3,h-.34,3.6],'Cámara que sigue al instructor',['cam'],'Detecta y sigue al instructor mientras camina, sin operador.',2.2,{in:['video']});
+      if(has('micCeil'))hs([-3,h-.05,1.1],'Micrófonos de techo con IA',['mic'],'Captan las preguntas de los participantes sin pasar micrófonos.',2.6,{in:['audio']});
+      if(has('micLav')){const lav=mk(new T.SphereGeometry(.025,10,8),m.redGlow,0,1.35,.17,S.presenter.g);S.mics.push(()=>lav.getWorldPosition(new V()));
+        hs(new V(),'Micrófono de solapa inalámbrico',['mic'],'Va con el instructor. Su voz se escucha igual en la sala, la transmisión y la grabación.',1.8,{in:['audio'],get:()=>lav.getWorldPosition(new V())})}
+      if(has('micHand')){credenza(1.0,-5.4,-3.6,.75);handDock(-5.4,.78,-3.6);hs([-5.4,1,-3.6],'Micrófonos de mano inalámbricos',['mic'],'Para preguntas del público y paneles con varios ponentes.',1.8,{in:['audio']})}
+      if(has('speakers'))hs([-2,h-.02,0],'Altavoces de techo',['mic'],'Cobertura pareja en toda el aula, unida o dividida.',2.4,{out:['audio']});
+      if(has('stream')){const pg=new T.Group();pg.position.set(4.9,0,3.35);root.add(pg);box(1.5,.05,.75,m.table,0,.74,0,pg);box(1.5,.7,.04,m.metal,0,.37,.35,pg);
+        box(.8,.06,.32,m.black,0,.8,0,pg);for(let i=0;i<8;i++)mk(new T.SphereGeometry(.018,8,8),i===2?m.redGlow:m.white,-.3+i*.085,.84,-.05,pg);
+        const prog=tex(640,360,drawCall,null);S.calls.push(prog);screenPlane(.55,.31,prog,-.35,1.0,-.22,0,pg);
+        hs([4.9,.95,3.35],'Producción y transmisión en vivo',['cam','ctrl'],'Mezcla cámaras, contenido y gráficos. Transmite a otras bases y graba cada módulo.',2.2,{in:['video','audio'],out:['video']})}
+      if(has('touch')){touch(-.9,1.05,-3.3,0);hs(S.anc.touch,'Controlador táctil del atril',['ctrl'],'Escenas de clase, unir o dividir aulas, iniciar grabación.',1.6,{in:['data'],out:['data']})}
+      if(has('zero')||has('byod')){laptop(-1.15,1.06,-3.35,.3,has('zero'));S.anc.laptop=new V(-1.15,1.15,-3.35)}
+      if(has('zero')){hs([-1.15,1.15,-3.35],'Cero cables',['ctrl'],'El instructor o cualquier participante presenta desde su equipo sin cables.',1.5,{in:['video','audio'],via:S.rackAP.clone(),zero:true});hs(S.rackAP,'Punto de acceso y receptor cero cables',['ctrl'],'Van en el rack junto al resto de controladores. Reciben la señal inalámbrica de las laptops y la entregan a pantallas, audio y cámara.',1.7)}
+      if(has('byod')){box(.12,.025,.12,m.black,-.85,1.06,-3.45);hs([-.85,1.08,-3.45],'Conexión USB-C del atril',['ctrl'],'Respaldo por cable para el instructor.',1.4,{in:['video','audio']})}
+      if(has('panel')){doorPanel(w/2+.035,1.35,3-.72,Math.PI/2,'Aula Tocumen','free');S.anc.panel=new V(w/2+.04,1.35,2.28);hs(S.anc.panel,'Panel de reserva',['ctrl'],'Agenda de cursos en la puerta de cada aula.',1.8,{out:['data']})}
+      hs([0,2.2,0],'Muro móvil con escenas',['ctrl'],'Un toque convierte dos aulas en un auditorio, con audio y video reconfigurados.',4);
+      hs(S.core,'Rack de sala',['ctrl','mic'],'Aquí llega todo: punto de acceso y receptor inalámbrico, procesador de audio, control, switch y cómputo de sala. Ordenado, ventilado y accesible para soporte.',2.4);
+      S.home={pos:new V(8.2,7,10),target:new V(0,.8,-.4)};},
+    lobby(){const w=10,d=4.6,h=3.2;shell(w,d,h);S.dim={w,d,h};
+      box(.45,.35,.35,m.black,-1.2,.175,-d/2+.25);setCore(-1.2,.35,-d/2+.25);
+      screenPlane(2.6,1.46,tex(1280,720,drawWelcome),-3,1.75,-d/2+.06);
+      [[.2,'Sala Lima','free'],[2.3,'Sala Bogotá','busy'],[4.2,'Sala São Paulo','busy']].forEach(r=>{
+        box(1.1,2.25,.06,m.glass,r[0],1.125,-d/2+.04);box(.05,2.25,.08,m.black,r[0]-.57,1.125,-d/2+.05);box(.05,2.25,.08,m.black,r[0]+.57,1.125,-d/2+.05);box(1.2,.05,.08,m.black,r[0],2.25,-d/2+.05);
+        doorPanel(r[0]+.82,1.35,-d/2+.07,0,r[1],r[2])});
+      const tg=new T.Group();tg.position.set(.9,0,.6);tg.rotation.y=-.35;root.add(tg);box(.7,.08,.42,m.black,0,.04,0,tg);box(.64,1.85,.12,m.black,0,1,0,tg);
+      mk(new T.PlaneGeometry(.56,1.0),new T.MeshBasicMaterial({map:tex(360,640,drawTotem).t,toneMapped:false}),0,1.2,.061,tg);
+      const wy=new T.Group();wy.position.set(-.9,h-.55,.4);root.add(wy);cyl(.01,.4,m.metal,-.5,.35,0,wy,6);cyl(.01,.4,m.metal,.5,.35,0,wy,6);screenPlane(1.4,.36,tex(1024,264,drawWay),0,0,0,0,wy);
+      person(-1.6,1.4,.6,true,'Visitante',true);person(3,1.2,-2.6,true,'Colaborador',true);
+      hs([-3,1.75,-2.2],'Videowall de bienvenida',['screen'],'Mensajes institucionales, eventos del día y comunicados con gestión central.',3.4,{out:['video']});
+      hs([.9,1.3,.62],'Tótem de señalización',['screen','ctrl'],'Estado de salas en vivo, mapa del piso y agenda. Táctil para buscar una sala.',2.2,{out:['video','data']});
+      hs([-.9,h-.55,.42],'Pantalla de orientación',['screen'],'Wayfinding colgante que guía a visitantes hacia salas y auditorio.',2.4,{out:['video']});
+      hs([3.12,1.35,-2.2],'Paneles de reserva en cada puerta',['ctrl'],'Rojo ocupada, blanco libre: el pasillo muestra la disponibilidad de un vistazo.',2.2,{out:['data']});
+      hs(S.core,'Reproductor de señalización',['ctrl'],'Recibe la programación desde la nube y la distribuye a cada pantalla.',1.8);
+      S.home={pos:new V(4.5,3.4,7),target:new V(.3,1.3,-.6)};}
+  };
+  function cable(a,b){const c=new T.CatmullRomCurve3([a,new V((a.x+b.x)/2,a.y-.005,(a.z+b.z)/2+.05),b]);mk(new T.TubeGeometry(c,12,.006,6,false),m.black,0,0,0)}
+
+  /* ---------- flujo de señal ---------- */
+  function route(a,b,sig){
+    const o={audio:.07,video:0,data:-.07}[sig];const H=S.dim.h;const hi=a.y>H-.5||b.y>H-.5;const y=hi?H-.08:.035;
+    return [a.clone(),new V(a.x+o,y,a.z+o),new V(b.x+o,y,a.z+o),new V(b.x+o,y,b.z+o),b.clone()];
+  }
+  function pathFrom(pts){const cp=new T.CurvePath();for(let i=0;i<pts.length-1;i++){if(pts[i].distanceTo(pts[i+1])>.001)cp.add(new T.LineCurve3(pts[i],pts[i+1]))}return cp}
+  function addPath(curve,sig,wireless,tagName){
+    const len=curve.getLength();if(len<.05)return;
+    const mat=new T.MeshBasicMaterial({color:SIGC[sig],transparent:true,opacity:wireless?.0:.45,depthWrite:false});
+    if(!wireless)mk(new T.TubeGeometry(curve,Math.max(8,Math.round(len*6)),.016,5,false),mat,0,0,0,S.flowG);
+    const pm=new T.MeshBasicMaterial({color:SIGC[sig]});const n=Math.min(16,Math.max(3,Math.round(len/(wireless?.18:.45))));const parts=[];
+    for(let i=0;i<n;i++){const s=mk(sphereG,pm,0,0,0,S.flowG);if(wireless)s.scale.setScalar(.75);parts.push(s)}
+    S.paths.push({curve,parts,len,sig,wireless,off:Math.random(),tag:tagName||''});
+  }
+  function buildFlow(){
+    S.flowG=new T.Group();root.add(S.flowG);S.paths=[];const c=S.core;if(!c)return;const lobby=S.room==='lobby';
+    S.hs.forEach(h=>{if(!h.in&&!h.out)return;const p=h.get?h.get():h.p;
+      (h.in||[]).forEach(sig=>{if(h.via){addPath(new T.QuadraticBezierCurve3(p.clone(),new V((p.x+h.via.x)/2,Math.max(p.y,h.via.y)+.7,(p.z+h.via.z)/2),h.via.clone()),sig,true,'zero');addPath(pathFrom(route(h.via,c,sig)),sig,false,'zero')}
+        else if(!h.get)addPath(pathFrom(route(p,c,sig)),sig)});
+      (h.out||[]).forEach(sig=>addPath(pathFrom(route(c,p,sig)),sig))});
+    // nube
+    const cl=new V(lobby?-1.2:c.x*.4,S.dim.h+1.3,-S.dim.d/2+.2);S.cloudPos=cl;
+    const ctex=tex(560,150,drawCloud,{lobby});const sp=new T.Sprite(new T.SpriteMaterial({map:ctex.t,transparent:true,depthTest:false}));sp.scale.set(2.2,.59,1);sp.position.copy(cl).add(new V(0,.45,0));S.flowG.add(sp);S.cloudTex=ctex;
+    const sigs=lobby?['data','video']:['audio','video','data'];
+    sigs.forEach((sig,i)=>{const o=(i-1)*.08;const up=[c.clone(),new V(c.x+o,S.dim.h-.08,c.z+o),new V(c.x+o,S.dim.h+.2,c.z+o),cl.clone().add(new V(o,0,0))];
+      if(!lobby)addPath(pathFrom(up),sig);addPath(pathFrom(up.slice().reverse().map(v=>v.clone().add(new V(.03,0,.03)))),sig)});
+    S.flowG.visible=S.flow;
+  }
+  /* ---------- IA: encuadre y haz de audio ---------- */
+  function buildAI(){
+    S.aiG=new T.Group();root.add(S.aiG);
+    S.frame=new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(1,1,1)),new T.LineBasicMaterial({color:0xD31224}));S.aiG.add(S.frame);
+    const bg=new T.CylinderGeometry(.015,.2,1,24,1,true);bg.translate(0,.5,0);
+    S.beam=new T.Mesh(bg,new T.MeshBasicMaterial({color:0x1E7BFF,transparent:true,opacity:.28,side:T.DoubleSide,depthWrite:false}));S.aiG.add(S.beam);
+    const fg=new T.BufferGeometry();fg.setAttribute('position',new T.BufferAttribute(new Float32Array(24),3));
+    S.frust=new T.LineSegments(fg,new T.LineBasicMaterial({color:0xD31224,transparent:true,opacity:.85}));S.aiG.add(S.frust);
+    S.aiG.visible=false;
+  }
+  function nearest(list,p){let best=null,bd=1e9;list.forEach(f=>{const q=f();const dd=q.distanceTo(p);if(dd<bd){bd=dd;best=q}});return best}
+  function updAI(dt){
+    if(S.presenter&&(S.ai||S.step===5||S.step===6)){const P=S.presenter;P.t=(P.t||0)+dt*.45;const k=(Math.sin(P.t)+1)/2;P.g.position.lerpVectors(P.a,P.b,k);P.g.rotation.y=Math.cos(P.t)>0?.5:-.5}
+    if(!S.ai||!S.act){S.aiG.visible=false;return}S.aiG.visible=true;
+    const a=S.act,base=a.g.getWorldPosition(new V()),head=a.head.getWorldPosition(new V());
+    const hgt=a.stand?1.9:1.0,cy=a.stand?.95:.88;S.frame.position.set(base.x,cy,base.z);S.frame.scale.set(.7,hgt,.7);
+    const mic=nearest(S.mics,head);if(mic){const dir=head.clone().sub(mic);S.beam.position.copy(mic);S.beam.scale.set(1,dir.length(),1);S.beam.quaternion.setFromUnitVectors(new V(0,1,0),dir.normalize());S.beam.visible=true}else S.beam.visible=false;
+    const cam=nearest(S.vcams,head);const pos=S.frust.geometry.attributes.position;
+    if(cam){const ctr=new V(base.x,cy,base.z);const dir=ctr.clone().sub(cam).normalize();const r=new V().crossVectors(dir,new V(0,1,0)).normalize().multiplyScalar(.35);const u=new V(0,hgt/2,0);
+      [ctr.clone().add(r).add(u),ctr.clone().sub(r).add(u),ctr.clone().add(r).sub(u),ctr.clone().sub(r).sub(u)].forEach((c,i)=>{pos.setXYZ(i*2,cam.x,cam.y,cam.z);pos.setXYZ(i*2+1,c.x,c.y,c.z)});pos.needsUpdate=true;S.frust.visible=true}else S.frust.visible=false;
+  }
+  function nextSpeaker(){
+    if(!S.ai)return;const pool=S.people.filter(p=>p.g.visible!==false);if(!pool.length)return;
+    S.actIdx++;let a;if(S.presenter&&S.actIdx%2===0)a=S.presenter;else{const seated=pool.filter(p=>p!==S.presenter);a=seated[Math.floor(Math.random()*seated.length)]||S.presenter}
+    S.people.forEach(p=>p.head.material=m.person);if(S.presenter)S.presenter.head.material=m.person;a.head.material=m.personHi;S.act=a;
+    S.calls.forEach(c=>c.redraw({self:a.name,led:c.arg&&c.arg.led}));
+    const hasCeil=S.mics.length,hasCam=S.vcams.length;
+    live(`<b>${a.name}</b> · Video: ${hasCam?'la cámara encuadra y sigue':'sin cámara'} · Audio: ${hasCeil?'el haz del micrófono apunta a su voz':'sin micrófonos'}`);
+  }
+  function setAI(on){
+    S.ai=on;$('#r3Ai').classList.toggle('on',on);clearInterval(S.aiT);
+    S.people.forEach(p=>p.head.material=m.person);if(S.presenter)S.presenter.head.material=m.person;S.act=null;
+    if(on){S.actIdx=-1;nextSpeaker();S.aiT=setInterval(nextSpeaker,3400)}
+    else{S.calls.forEach(c=>c.redraw({led:c.arg&&c.arg.led}));if(S.step<0)live(null)}
+  }
+  function setFlow(on,only){S.flow=on;S.flowOnly=only||null;$('#r3Flow').classList.toggle('on',on&&!only);if(S.flowG)S.flowG.visible=on;$('#r3Legend').hidden=!on;host.classList.toggle('flow-on',on)}
+
+  /* ---------- init ---------- */
+  function init(){
+    if(S.inited)return S.ok;S.inited=true;host=$('#r3');
+    if(!window.THREE){$('#r3Fail').hidden=false;return S.ok=false}
+    T=window.THREE;V=T.Vector3;
+    try{rd=new T.WebGLRenderer({antialias:true});}catch(e){$('#r3Fail').hidden=false;return S.ok=false}
+    rd.setPixelRatio(Math.min(window.devicePixelRatio||1,2));rd.outputEncoding=T.sRGBEncoding;rd.setClearColor(0x4A4747);
+    host.insertBefore(rd.domElement,host.firstChild);
+    scene=new T.Scene();camera=new T.PerspectiveCamera(42,1,.05,100);
+    scene.add(new T.HemisphereLight(0xffffff,0x2a2525,.62));const dl=new T.DirectionalLight(0xffffff,.62);dl.position.set(6,10,7);scene.add(dl);
+    const pl=new T.PointLight(0xffffff,.3,20);pl.position.set(0,2.6,1);scene.add(pl);
+    const S0=(c,o)=>new T.MeshStandardMaterial(Object.assign({color:c,roughness:.8,metalness:.05},o||{}));
+    m={floor:S0(0x232020),wall:S0(0x3A3535),wall2:S0(0x332F2F),table:S0(0x8A8282,{roughness:.4}),chair:S0(0x1C1A1A),metal:S0(0x777070,{metalness:.5,roughness:.4}),cred:S0(0x2A2626),
+      body:S0(0x5A5454),person:S0(0xB5ADAD),personHi:S0(0xD31224,{emissive:0x8a0a16,emissiveIntensity:.8}),black:S0(0x0D0C0C,{roughness:.35}),white:S0(0xE6E6E6,{roughness:.5}),lap:S0(0x8C8C8C,{metalness:.4,roughness:.35}),
+      lens:S0(0x050505,{roughness:.1,metalness:.6}),red:S0(0xD31224),redGlow:new T.MeshBasicMaterial({color:0xD31224}),blueGlow:new T.MeshBasicMaterial({color:0x1E7BFF}),rackM:S0(0x161414,{roughness:.5}),grill:S0(0xBDBDBD),
+      glass:new T.MeshStandardMaterial({color:0xDADADA,transparent:true,opacity:.12,roughness:.1,depthWrite:false}),divider:S0(0x5A5353)};
+    sphereG=new T.SphereGeometry(.05,10,8);
+    if(T.OrbitControls){controls=new T.OrbitControls(camera,rd.domElement);controls.enableDamping=true;controls.dampingFactor=.08;controls.maxPolarAngle=1.45;controls.minDistance=.8;controls.maxDistance=26;
+      controls.addEventListener('start',()=>{S.fly=null;if(S.tour)setTour(false);if(S.auto)setAuto(false)})}
+    root=new T.Group();scene.add(root);
+    const tb=$('#r3Tabs');Object.entries(ROOMDEF).forEach(([k,r])=>{const b=document.createElement('button');b.className='tab';b.dataset.k=k;b.setAttribute('role','tab');b.innerHTML=r[0]+'<small>'+r[1]+'</small>';b.onclick=()=>{stopSteps();build(k)};tb.appendChild(b)});
+    $('#r3Tour').onclick=()=>{stopSteps();setTour(!S.tour)};$('#r3Ai').onclick=()=>{stopSteps(true);setAI(!S.ai)};$('#r3Flow').onclick=()=>{stopSteps(true);setFlow(!(S.flow&&!S.flowOnly))};
+    $('#r3Home').onclick=()=>{setTour(false);closeCard();flyHome()};$('#r3Steps').onclick=()=>startSteps();
+    $('#r3Div').onclick=()=>{S.divOpen=!S.divOpen;$('#r3Div').textContent=S.divOpen?'Dividir aulas':'Unir aulas';$('#r3Div').classList.toggle('on',S.divOpen);live(S.divOpen?'Aulas unidas: audio, video y control se combinan solos':'Aulas divididas: cada una con su propio sistema',3500)};
+    window.addEventListener('resize',size);
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>S.texs.forEach(t=>t.redraw()));
+    build('medium');return S.ok=true;
+  }
+  function clearRoom(){
+    S.timers.forEach(clearInterval);S.timers=[];clearInterval(S.aiT);
+    root.traverse(o=>{if(o.geometry&&o.geometry!==sphereG)o.geometry.dispose()});S.texs.forEach(t=>t.t.dispose());
+    scene.remove(root);root=new T.Group();scene.add(root);
+    Object.assign(S,{hs:[],people:[],ptz:[],cones:[],texs:[],panels:[],doorPanels:[],calls:[],contents:[],mics:[],vcams:[],paths:[],pulses:[],presenter:null,act:null,core:null,anc:{},sel:-1,divOpen:false});
+  }
+  function build(k,keepView){
+    setTour(false);clearRoom();S.room=k;
+    const set=S.opts[k];BUILD[k](id=>!!set&&set.has(id));buildFlow();buildAI();
+    if(!keepView){S.fly=null;camera.position.copy(S.home.pos);if(controls){controls.target.copy(S.home.target);controls.update()}else camera.lookAt(S.home.target)}
+    $$('#r3Tabs .tab').forEach(t=>{t.classList.toggle('on',t.dataset.k===k);t.setAttribute('aria-selected',t.dataset.k===k)});
+    const lobby=k==='lobby';$('#r3Ai').hidden=lobby;$('#r3Steps').hidden=lobby;$('#r3Div').hidden=k!=='train';$('#r3Div').textContent='Unir aulas';$('#r3Div').classList.remove('on');
+    if(lobby)S.timers.push(setInterval(()=>{const p=S.doorPanels[Math.floor(Math.random()*S.doorPanels.length)];if(p)setPanel(p,p.state==='busy'?'free':'busy')},3200));
+    labels();side();closeCard();setFlow(S.flow,S.flowOnly);if(S.ai)setAI(true);else if(S.step<0)live(null);
+  }
+  function toggleOpt(id){const s=S.opts[S.room];if(s.has(id))s.delete(id);else s.add(id);S.level[S.room]=-1;stopSteps(true);build(S.room,true)}
+  function setLevel(i){S.level[S.room]=i;S.opts[S.room]=new Set(AV[S.room].L[i]);stopSteps(true);build(S.room,true)}
+
+  /* ---------- panel lateral ---------- */
+  function side(){
+    const k=S.room,box2=$('#r3Opts'),lv=$('#r3Lvl');
+    if(k==='lobby'){lv.parentElement.hidden=true;box2.innerHTML='<h4>Señalización digital</h4><p class="r3-note">Videowall de bienvenida, tótem táctil, pantalla de orientación y paneles en cada puerta, todo programado desde una consola central.</p>';$('#r3Count').textContent=S.hs.length+' elementos en el pasillo';return}
+    lv.parentElement.hidden=false;lv.innerHTML=LEVELS.map((n,i)=>`<button class="${S.level[k]===i?'on':''}" data-i="${i}">${n}</button>`).join('');
+    lv.querySelectorAll('button').forEach(b=>b.onclick=()=>setLevel(+b.dataset.i));
+    const av=AV[k].avail,set=S.opts[k];
+    box2.innerHTML=GROUPS.map(g=>{const ids=av.filter(id=>OPT[id][0]===g);if(!ids.length)return'';
+      return `<h4>${g}</h4><div class="opts">${ids.map(id=>`<button class="opt${set.has(id)?' on':''}${OPT[id][2]?' star':''}" data-id="${id}" aria-pressed="${set.has(id)}"><i></i><span>${OPT[id][1]}</span>${OPT[id][2]?'<em>Recomendado</em>':''}</button>`).join('')}</div>`}).join('');
+    box2.querySelectorAll('.opt').forEach(b=>b.onclick=()=>toggleOpt(b.dataset.id));
+    const nIn=S.hs.filter(h=>h.in).length,nOut=S.hs.filter(h=>h.out).length;
+    $('#r3Count').innerHTML=`<b>${S.hs.length}</b> elementos · <b>${nIn}</b> entradas · <b>${nOut}</b> salidas`;
+  }
+  /* ---------- etiquetas y tarjeta ---------- */
+  function ioTag(h){const i=h.in&&h.in.length,o=h.out&&h.out.length;return i&&o?'IN/OUT':i?'IN':o?'OUT':h.n==='Rack de sala'?'RACK':h.n.startsWith('Reproductor')?'NÚCLEO':''}
+  function labels(){const L=$('#r3Labels');L.innerHTML='';S.hs.forEach((h,i)=>{const b=document.createElement('button');b.className='r3-hot'+(h.zero?' zero':'');const t=ioTag(h);
+    b.innerHTML=`<b>${i+1}</b><span>${h.n}</span>${t?`<i class="io">${t}</i>`:''}`;b.setAttribute('aria-label',h.n);b.onclick=()=>{setTour(false);select(i)};L.appendChild(b);h.el=b})}
+  function select(i){
+    S.sel=i;const h=S.hs[i];const p=h.get?h.get():h.p;S.hs.forEach((x,k)=>x.el.classList.toggle('sel',k===i));
+    const dir=S.home.pos.clone().sub(p).normalize();const to=p.clone().add(dir.multiplyScalar(h.z));to.y=Math.max(to.y,p.y+.25,.9);
+    fly(to,p.clone());const t=ioTag(h);
+    const c=$('#r3Card');c.hidden=false;c.innerHTML=`<div class="h"><div class="tg">${h.c.map(k=>'<span>'+CAT[k]+'</span>').join('<span>·</span>')}${t?`<span class="io">${t}</span>`:''}</div><button aria-label="Cerrar">×</button></div><h3>${h.n}</h3><p>${h.d}</p>`;
+    c.querySelector('button').onclick=()=>{setTour(false);closeCard();flyHome()};
+  }
+  function closeCard(){S.sel=-1;$('#r3Card').hidden=true;S.hs.forEach(x=>x.el&&x.el.classList.remove('sel'))}
+  function fly(pos,target,dur){S.fly={p0:camera.position.clone(),p1:pos,t0:controls?controls.target.clone():S.home.target.clone(),t1:target,s:performance.now(),d:dur||1300}}
+  function flyHome(){fly(S.home.pos.clone(),S.home.target.clone())}
+  function flyNear(p,dist,off){const o=off||S.home.pos.clone().sub(p).normalize();fly(p.clone().add(o.clone().normalize().multiplyScalar(dist)).add(new V(0,.3,0)),p.clone())}
+  function live(msg,ms){const l=$('#r3Live');clearTimeout(live._t);if(!msg){l.hidden=true;return}l.hidden=false;l.innerHTML=msg;if(ms)live._t=setTimeout(()=>{if(!S.ai&&S.step<0)l.hidden=true},ms)}
+  function setTour(on){
+    S.tour=on;$('#r3Tour').classList.toggle('on',on);$('#r3Tour').textContent=on?'■ Detener':'Recorrer equipos';clearInterval(S.tourT);
+    if(on){const step=()=>{const n=S.hs.length;if(!n)return;if(S.sel===n-1){closeCard();flyHome();S.sel=-2;return}select(S.sel<0?0:S.sel+1)};step();S.tourT=setInterval(step,4300)}
+  }
+
+  /* ---------- paso a paso ---------- */
+  const STEPS=[
+    {t:'Se agenda la reunión',d:p=>`Alguien crea la invitación en ${p} y agrega la sala como un invitado más. Funciona igual con Teams, Google Meet, Zoom o Webex.`,b:'La sala tiene su propia cuenta de recurso en el calendario corporativo.',plat:true},
+    {t:'La sala se reserva sola',d:()=>'El panel de la puerta muestra la reunión y la luz se pone roja: desde el pasillo todos saben que está apartada.',b:'El panel se sincroniza con el calendario en tiempo real.'},
+    {t:'Llegada y check-in',d:()=>'El equipo entra, confirma en el panel y el sensor detecta presencia. Si nadie llega, la sala se libera para otro equipo.',b:'Sensor de ocupación anónimo + reglas de liberación automática.'},
+    {t:'Cero cables',d:p=>`Quien presenta toca el botón en su laptop. La señal viaja sin cables al punto de acceso del rack. Su pantalla aparece en la sala y su reunión de ${p} usa la cámara, los micrófonos y los altavoces de la sala. Sin cables ni adaptadores.`,b:'Conexión inalámbrica cifrada hasta el receptor, montado en el rack junto al punto de acceso y los controladores.'},
+    {t:'Un toque y empieza',d:p=>`En el controlador aparece la reunión agendada. Un toque y la sala se une a ${p}; las pantallas encienden solas.`,b:'El sistema de sala lee el calendario y se conecta sin códigos.'},
+    {t:'La IA sigue la conversación',d:()=>'La cámara encuadra a quien habla, aunque camine. Los micrófonos forman un haz hacia su voz y eliminan ruido y eco. Los remotos ven y escuchan como si estuvieran en la mesa.',b:'Encuadre automático por video + seguimiento de voz por audio (haz de micrófonos).'},
+    {t:'El flujo completo',d:p=>`Entradas (micrófonos, cámaras, laptops) → rack de sala → salidas (pantallas, altavoces) y la nube de ${p}, ida y vuelta.`,b:'Azul: audio · Rojo: video · Blanco: control y datos · Arcos: inalámbrico hasta el rack.'},
+    {t:'Cierre con resumen',d:p=>`Al terminar, ${p} envía transcripción y resumen con acuerdos. La sala se libera y los datos de uso quedan para la analítica.`,b:'Integración con la plataforma de reuniones y el calendario corporativo.'}
+  ];
+  function startSteps(){
+    const s=S.opts[S.room];let changed=false;['zero','touch','panel'].forEach(id=>{if(AV[S.room].avail.includes(id)&&!s.has(id)){s.add(id);changed=true}});
+    if(changed){S.level[S.room]=-1;build(S.room,true)}
+    setTour(false);closeCard();goStep(0);
+  }
+  function stopSteps(keep){if(S.step<0)return;S.step=-1;setAuto(false);$('#r3Step').hidden=true;$('#r3Steps').classList.remove('on');
+    S.people.forEach(p=>p.g.visible=true);if(!keep){setFlow(false);setAI(false)}else setFlow(S.flow);live(null);S.calls.forEach(c=>c.redraw({led:c.arg&&c.arg.led}))}
+  function setAuto(on){S.auto=on;clearInterval(S.autoT);const b=$('#r3Auto');if(b){b.textContent=on?'❚❚ Pausa':'▶ Reproducir';b.classList.toggle('on',on)}
+    if(on)S.autoT=setInterval(()=>{if(S.step<STEPS.length-1)goStep(S.step+1);else setAuto(false)},7000)}
+  function goStep(i){
+    S.step=i;$('#r3Steps').classList.add('on');const st=STEPS[i],P=S.platform,a=S.anc||{},panel=S.doorPanels[0];
+    setAI(false);setFlow(false);closeCard();
+    const seated=S.people.filter(p=>p!==S.presenter);
+    seated.forEach(p=>p.g.visible=i>=2);if(S.presenter)S.presenter.g.visible=i>=2;
+    S.calls.forEach(c=>c.redraw({idle:true,led:c.arg&&c.arg.led}));S.contents.forEach(c=>c.redraw({idle:true,led:c.arg&&c.arg.led}));
+    if(i===0){setPanel(panel,'free');flyHome();live('Invitación creada en '+P)}
+    if(i===1){setPanel(panel,'res');if(a.panel)flyNear(a.panel,1.7,new V(1,.15,.35));live('Panel: reservada 10:00 · luz roja en el pasillo')}
+    if(i===2){setPanel(panel,'busy');flyHome();live('Check-in confirmado · sensor: '+(seated.length+(S.presenter?1:0))+' personas')}
+    if(i===3){setPanel(panel,'busy');S.contents.forEach(c=>c.redraw({led:c.arg&&c.arg.led}));setFlow(true,'zero');if(a.laptop)fly(S.home.pos.clone().lerp(S.home.target,.25),a.laptop.clone().lerp(S.rackAP||a.laptop,.5));live('Botón presionado · pantalla, cámara y audio sin cables')}
+    if(i===4){setPanel(panel,'busy');S.calls.forEach(c=>c.redraw({led:c.arg&&c.arg.led}));S.contents.forEach(c=>c.redraw({led:c.arg&&c.arg.led}));if(a.touch)flyNear(a.touch,1.6);live('La sala se unió a '+P)}
+    if(i===5){setPanel(panel,'busy');S.contents.forEach(c=>c.redraw({led:c.arg&&c.arg.led}));setAI(true);fly(S.home.pos.clone().lerp(S.home.target,.3),S.home.target.clone())}
+    if(i===6){setPanel(panel,'busy');S.contents.forEach(c=>c.redraw({led:c.arg&&c.arg.led}));setFlow(true);setAI(true);fly(S.home.pos.clone().multiplyScalar(1.05).add(new V(0,.8,0)),S.home.target.clone().add(new V(0,.6,0)))}
+    if(i===7){setPanel(panel,'free');S.calls.forEach(c=>c.redraw({summary:true,led:c.arg&&c.arg.led}));if(a.screen)flyNear(a.screen,3);live('Resumen enviado · sala liberada')}
+    const el=$('#r3Step');el.hidden=false;
+    el.innerHTML=`<div class="sh"><span>Paso ${i+1} de ${STEPS.length}</span><div class="dots">${STEPS.map((_,k)=>`<button class="${k===i?'on':k<i?'done':''}" data-k="${k}" aria-label="Paso ${k+1}"></button>`).join('')}</div><button class="x" aria-label="Cerrar">×</button></div>
+      <h3>${st.t}</h3><p>${st.d(P)}</p>
+      ${st.plat?`<div class="plats">${PLATS.map(p=>`<button class="${p===P?'on':''}" data-p="${p}">${p}</button>`).join('')}</div><div class="invite"><b>Coordinación operativa</b><span>Hoy · 10:00–10:45 · ${P}</span><span>Invitados: Ana, Luis, Carla, Jorge +3 · <strong>${ROOMDEF[S.room][0]==='Capacitación'?'Aula Tocumen':'Sala '+({huddle:'Lima',medium:'Bogotá',board:'Directorio'}[S.room]||'')}</strong> (sala)</span></div>`:''}
+      <p class="bts"><b>Detrás de escena</b>${st.b}</p>
+      <div class="nav2"><button id="r3Prev" ${i===0?'disabled':''}>← Anterior</button><button id="r3Auto">${S.auto?'❚❚ Pausa':'▶ Reproducir'}</button><button id="r3Next" class="pri">${i===STEPS.length-1?'Terminar':'Siguiente →'}</button></div>`;
+    el.querySelector('.x').onclick=()=>{stopSteps();flyHome()};
+    el.querySelectorAll('.dots button').forEach(b=>b.onclick=()=>{setAuto(false);goStep(+b.dataset.k)});
+    el.querySelectorAll('.plats button').forEach(b=>b.onclick=()=>{S.platform=b.dataset.p;if(S.cloudTex)S.cloudTex.redraw();goStep(0)});
+    $('#r3Prev').onclick=()=>{setAuto(false);goStep(i-1)};$('#r3Next').onclick=()=>{if(i===STEPS.length-1){stopSteps();flyHome()}else goStep(i+1)};$('#r3Auto').onclick=()=>setAuto(!S.auto);
+    if(S.cloudTex)S.cloudTex.redraw();
+  }
+
+  /* ---------- render ---------- */
+  const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;let last=0;
+  function frame(now){
+    if(!S.active){S.raf=null;return}S.raf=requestAnimationFrame(frame);const dt=Math.min(.05,(now-(last||now))/1000);last=now;
+    if(S.fly){const k=Math.min(1,(now-S.fly.s)/S.fly.d),e=ease(k);camera.position.lerpVectors(S.fly.p0,S.fly.p1,e);const t=new V().lerpVectors(S.fly.t0,S.fly.t1,e);if(controls)controls.target.copy(t);else camera.lookAt(t);if(k>=1)S.fly=null}
+    if(controls)controls.update();
+    S.cones.forEach((c,i)=>{c.material.opacity=(i%2?.25:.07)+(S.ai?.08:.03)*(1+Math.sin(now/500+i))});
+    S.pulses.forEach(r=>{const s=1+((now/700)%1)*1.8;r.scale.set(s,s,s);r.material.opacity=1});
+    updAI(dt);
+    const aim=S.act?S.act.head.getWorldPosition(new V()):new V(0,1.1,.3);
+    S.ptz.forEach(h=>{const q0=h.quaternion.clone();h.lookAt(aim);const q1=h.quaternion.clone();h.quaternion.copy(q0).slerp(q1,.07)});
+    S.panels.forEach(p=>{const i=p.userData.i;const tz=S.divOpen?-3.6+i*.12:p.userData.z0,tr=S.divOpen?Math.PI/2:0,tx=S.divOpen?.4:0;
+      p.position.z+=(tz-p.position.z)*.06;p.position.x+=(tx-p.position.x)*.06;p.rotation.y+=(tr-p.rotation.y)*.06});
+    if(S.flow&&S.flowG){const tt=now/1000;S.paths.forEach(pa=>{const show=!S.flowOnly||pa.tag===S.flowOnly;pa.parts.forEach((s,i)=>{s.visible=show;if(!show)return;const u=(pa.off+i/pa.parts.length+tt*(pa.wireless?.9:.75)/pa.len)%1;pa.curve.getPointAt(u,s.position)})})}
+    const W=host.clientWidth,H=host.clientHeight,v=new V();
+    S.hs.forEach(h=>{v.copy(h.get?h.get():h.p).project(camera);const x=(v.x+1)/2*W,y=(1-v.y)/2*H;const off=v.z>1||x<-40||x>W+40||y<-20||y>H+20;
+      h.el.style.visibility=off?'hidden':'visible';h.el.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%)`});
+    rd.render(scene,camera);
+  }
+  function size(){if(!rd)return;const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;rd.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+  return{
+    show(k){this.start();if(!S.ok)return;stopSteps();build(k)},
+    start(){if(!init())return;S.active=true;size();if(!S.raf)S.raf=requestAnimationFrame(frame)},
+    stop(){S.active=false;if(S.inited&&S.ok){setTour(false);setAuto(false)}}
+  };
+})();
+
+/* ============ Cero cables ============ */
+const ZC={dev:'laptop',mode:'share',plat:'Microsoft Teams',on:false,raf:null,dots:[]};
+function zcSeg(id,key,after){$$('#'+id+' button').forEach(b=>b.onclick=()=>{$$('#'+id+' button').forEach(x=>x.classList.toggle('on',x===b));ZC[key]=b.dataset.v;after&&after()})}
+function zcApply(){
+  if(ZC.mode==='conf'&&ZC.dev!=='laptop'){ZC.mode='share';$$('#zcMode button').forEach(x=>x.classList.toggle('on',x.dataset.v==='share'));toast('La conferencia inalámbrica se usa desde la laptop; tablet y teléfono comparten pantalla.')}
+  $('#zcLaptop').style.display=ZC.dev==='laptop'?'':'none';$('#zcTablet').style.display=ZC.dev==='tablet'?'':'none';$('#zcPhone').style.display=ZC.dev==='phone'?'':'none';
+  $('#zcPlatRow').hidden=ZC.mode!=='conf';$('#zcPlatTxt').textContent='EN VIVO · '+ZC.plat.toUpperCase();
+  const st={laptop:[246,334],tablet:[200,300],phone:[182,300]}[ZC.dev];$('#zcPath').setAttribute('d',`M${st[0]} ${st[1]} C 320 240, 440 230, 506 262`);$('#zcBack').setAttribute('d',`M506 266 C 440 240, 320 250, ${st[0]+4} ${st[1]-4}`);
+  if(ZC.on)zcShow();
+}
+function zcShow(){
+  const conf=ZC.mode==='conf';
+  $('#zcScrIdle').style.display=ZC.on?'none':'';$('#zcScrShare').style.display=ZC.on&&!conf?'':'none';$('#zcScrConf').style.display=ZC.on&&conf?'':'none';
+  $('#zcLens').setAttribute('fill',ZC.on&&conf?'#D31224':'#333');$('#zcMicW').setAttribute('opacity',ZC.on&&conf?1:0);$('#zcRecLed').setAttribute('fill',ZC.on?'#D31224':'#8a8484');
+  $('#zcDevScr').setAttribute('fill',ZC.on?'#3a1418':'#141313');
+  const st=$('#zcStatus');st.classList.toggle('on',ZC.on);
+  st.textContent=!ZC.on?'Sala lista · esperando':conf?`Su reunión de ${ZC.plat} usa la cámara, los micrófonos y los altavoces de la sala`:'Presentando en la pantalla de la sala · sin cables';
+  $('#zcGo').textContent=ZC.on?'Desconectar':'Tocar el botón';
+}
+function zcLoop(now){
+  if(!ZC.on||ids[cur]!=='cero'){ZC.raf=null;return}ZC.raf=requestAnimationFrame(zcLoop);
+  const P=ZC.mode==='conf'?[[$('#zcPath'),'#D31224',4,0],[$('#zcDisp'),'#D31224',2,0],[$('#zcCam'),'#D31224',3,0],[$('#zcMicPath'),'#1E7BFF',8,0],[$('#zcBack'),'#1E7BFF',4,0],[$('#zcBack'),'#D31224',4,.125]]:[[$('#zcPath'),'#D31224',6,0],[$('#zcDisp'),'#D31224',2,0]];
+  const g=$('#zcDots');let k=0;
+  P.forEach(([path,col,n,ph])=>{const L=path.getTotalLength();for(let i=0;i<n;i++){let c=ZC.dots[k];if(!c){c=document.createElementNS(NS,'circle');c.setAttribute('r',4);g.appendChild(c);ZC.dots[k]=c}
+    c.setAttribute('fill',col);c.style.display='';const u=((now/1600)+i/n+ph)%1;const pt=path.getPointAtLength(u*L);c.setAttribute('cx',pt.x);c.setAttribute('cy',pt.y);k++}});
+  for(;k<ZC.dots.length;k++)ZC.dots[k].style.display='none';
+}
+function zcGo(){
+  if(ZC.on){ZC.on=false;ZC.dots.forEach(d=>d.style.display='none');zcShow();return}
+  $('#zcStatus').textContent='Conectando…';$('#zcGo').disabled=true;
+  setTimeout(()=>{$('#zcGo').disabled=false;ZC.on=true;zcShow();if(!ZC.raf)ZC.raf=requestAnimationFrame(zcLoop)},reduce?0:900);
+}
+zcSeg('zcDev','dev',zcApply);zcSeg('zcMode','mode',zcApply);zcSeg('zcPlat','plat',zcApply);$('#zcGo').onclick=zcGo;zcApply();
+
+/* ============ Casos de éxito ============ */
+const CASES=[
+  {n:'Banco General',num:'10+',u:'salas',d:'Más de 10 salas de reuniones, salas de capacitación y auditorio.',t:['Salas','Capacitación','Auditorios'],room:'board',rl:'Ver sala de directorio en 3D'},
+  {n:"McDonald's",num:'5+',u:'salas',d:'Más de 5 salas de reuniones integradas.',t:['Salas'],room:'medium',rl:'Ver sala mediana en 3D'},
+  {n:'Colegio SABIS',num:'12',u:'salones',d:'12 salones de clase y auditorios.',t:['Aulas','Auditorios'],room:'train',rl:'Ver aula en 3D'},
+  {n:'DHL Panamá',num:'3',u:'salas',d:'3 salas de reuniones y capacitación.',t:['Salas','Capacitación'],room:'train',rl:'Ver sala de capacitación en 3D'},
+  {n:'Toledano',num:'5+',u:'salas',d:'Más de 5 salas y pasillos.',t:['Salas','Pasillos'],room:'lobby',rl:'Ver pasillos en 3D'}
+];
+const CSF=['Todos','Salas','Capacitación','Aulas','Auditorios','Pasillos'];let csCur='Todos';
+function renderCases(){
+  $('#csFilter').innerHTML=CSF.map(f=>`<button class="${f===csCur?'on':''}" data-f="${f}">${f}</button>`).join('');
+  $$('#csFilter button').forEach(b=>b.onclick=()=>{csCur=b.dataset.f;renderCases()});
+  $('#csGrid').innerHTML=CASES.map((c,i)=>{const hit=csCur!=='Todos'&&c.t.includes(csCur),dim=csCur!=='Todos'&&!c.t.includes(csCur);
+    return `<article class="cs${hit?' hit':''}${dim?' dim':''}"><div class="cs-top"><h3>${c.n}</h3>${c.num?`<div class="num">${c.num}<small>${c.u}</small></div>`:''}</div><p>${c.d}</p><div class="tags">${c.t.map(t=>'<span>'+t+'</span>').join('')}</div><button class="go3d" data-i="${i}">${c.rl} →</button></article>`}).join('')+
+    `<article class="cs more"><h3>Entre otras organizaciones.</h3><p>Banca, educación, logística, consumo y corporativos confían en Omicron para diseñar, integrar y dar soporte a sus espacios de colaboración.</p></article>`;
+  $$('#csGrid .go3d').forEach(b=>b.onclick=()=>{const c=CASES[+b.dataset.i];go(ids.indexOf('recorrido'));Room3D.show(c.room)});
+}
+renderCases();
+
+/* ============ Entrar a cada diapositiva ============ */
+function onEnter(id){
+  if(id==='ia')startSim();else stopSim();
+  if(id==='recorrido')Room3D.start();else Room3D.stop();
+  if(id==='cero'&&ZC.on&&!ZC.raf)ZC.raf=requestAnimationFrame(zcLoop);
+  if(id==='reserva'&&!$('#scr').innerHTML)renderTablet();
+}
+setScen(0);renderPh();updDeliv();drawFeats();renderTablet();
+fromHash();
+})();
+</script>
+
+</body>
+</html>
